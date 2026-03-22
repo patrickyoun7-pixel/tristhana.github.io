@@ -625,9 +625,10 @@
     /* ── INSTRUCTOR PHOTO ── */
     .ic-photo {
       width: 100%;
-      aspect-ratio: 3 / 4;
+      height: 260px;
       overflow: hidden;
       display: block;
+      flex-shrink: 0;
     }
 
     .ic-photo img {
@@ -645,10 +646,11 @@
 
     .ic-photo-placeholder {
       width: 100%;
-      aspect-ratio: 3 / 4;
+      height: 260px;
       background: var(--surface-2);
       display: grid;
       place-items: center;
+      flex-shrink: 0;
     }
 
     .ic-photo-placeholder .ic-initials-lg {
@@ -2393,6 +2395,8 @@
       .bottom-row { grid-template-columns: 1fr; width: 100%; margin: 1.5px 0 0; }
       .instructor-card { padding: 0; }
       .ic-body-inner { padding: 1.4rem 1.2rem 1.6rem; }
+      .ic-photo { height: 300px; }
+      .ic-photo-placeholder { height: 300px; }
 
       /* LINEAGE */
       .lineage-card { width: 100%; padding: 1.5rem; display: grid; grid-template-columns: 60px 1fr; gap: 1.2rem; }
@@ -2478,6 +2482,8 @@
       .ic-role { font-size: 0.65rem; }
       .ic-name { font-size: 1.15rem; }
       .ic-bio { font-size: 0.82rem; line-height: 1.9; color: var(--text-secondary); }
+      .ic-photo { height: 240px; }
+      .ic-photo-placeholder { height: 240px; }
 
       /* Lineage */
       .lineage-card { padding: 1.3rem; gap: 1rem; }
