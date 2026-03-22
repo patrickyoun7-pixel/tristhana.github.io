@@ -2072,6 +2072,27 @@
       color: var(--text-secondary);
     }
 
+    .shala-map-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--mint);
+      border: 1px solid rgba(55,178,148,0.35);
+      padding: 0.28rem 0.75rem;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      white-space: nowrap;
+      margin-left: auto;
+    }
+
+    .shala-map-link:hover {
+      background: rgba(55,178,148,0.08);
+      border-color: var(--mint);
+    }
+
     /* ── COMMUNITY ── */
     .community-section {
       background: var(--surface-2);
@@ -2717,6 +2738,12 @@
     <div class="shala-location-label">
       <span class="shala-tag" data-i18n="shala_second_tag">제2수련장</span>
       <span class="shala-address" data-i18n="shala_second_addr_short">판교역로 221</span>
+      <a href="map.html" target="_blank"
+         onclick="window.open('map.html','tristhana_map','width=900,height=700,scrollbars=yes,resizable=yes');return false;"
+         class="shala-map-link" data-i18n="shala_map_link" aria-label="제2수련장 오시는 길 새창 열기">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        오시는 길
+      </a>
     </div>
   </div>
 
@@ -3477,6 +3504,7 @@
       shala_main_tag: '본원',
       shala_main_addr_short: '판교역로 223 에이치스퀘어 S동 226호',
       shala_second_tag: '제2수련장',
+      shala_map_link: '오시는 길',
       shala_second_addr_short: '판교역로 221',
       fig_main_space: 'Tristhana Yoga 본원 수련 공간 — 분당 판교',
       fig_main_sign: '본원 매트 보관함',
@@ -3627,6 +3655,7 @@
       shala_main_tag: 'Main Shala',
       shala_main_addr_short: '226, S-Dong, H-Square, 223 Pangyoyeok-ro',
       shala_second_tag: '2nd Shala',
+      shala_map_link: 'Directions',
       shala_second_addr_short: '221 Pangyoyeok-ro',
       fig_main_space: 'Tristhana Yoga Main Shala — Bundang Pangyo',
       fig_main_sign: 'Mat Storage — Main Shala',
