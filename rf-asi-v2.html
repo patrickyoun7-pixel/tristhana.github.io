@@ -757,11 +757,15 @@ async function stFetch(endpoint, params={}) {
 
   if (!resp.ok) {
     let detail = '';
-    try { const j = await resp.json(); detail = j.message || j.error || JSON.stringify(j); } catch{}
-    throw new Error(`HTTP ${resp.status}: ${detail || resp.statusText}`);
+    try { const j = await resp.json(); detail = j.message || j.error || j.detail || JSON.stringify(j); } catch{}
+    const errMsg = `HTTP ${resp.status}: ${detail || resp.statusText}`;
+    log(`✗ ${errMsg}`, 'err');
+    throw new Error(errMsg);
   }
 
-  return resp.json();
+  const json = await resp.json();
+  log(`  ↳ keys: [${Object.keys(json).join(', ')}]`, 'info');
+  return json;
 }
 
 // ─────────────── TOKEN UI ───────────────
@@ -878,17 +882,21 @@ function selectProject(id, name) {
   document.getElementById('step2Sub').textContent        = name;
   document.getElementById('step1Num').className          = 'step-num';
   document.getElementById('projectArea').style.display   = 'none';
-  // Reset all section results
-  const icons = {assets:'🖥',tagging:'🏷',exposure:'🔓',rules:'📐'};
-  Object.keys(icons).forEach(s => {
-    document.getElementById(`r-${s}`).innerHTML =
-      `<div class="sbox"><div class="sicon">${icons[s]}</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div>`;
-    setCount(s, null); setSecErr(s, '');
+  ['assets','tagging','exposure','rules'].forEach(s => {
+    openSec(s);
+    setCount(s, null);
+    setSecErr(s, '');
   });
-  openSec('assets');
-  log(`프로젝트 선택: "${name}" (${id})`, 'ok');
-  toast(`"${name}" 선택됨`, 'ok');
-  setTimeout(() => document.getElementById('sec-assets').scrollIntoView({behavior:'smooth',block:'start'}), 200);
+  log(`프로젝트 선택: "${name}" (ID: ${id})`, 'ok');
+  toast(`"${name}" — 데이터 로딩 중…`, 'ok');
+  setTimeout(() => {
+    document.getElementById('sec-assets').scrollIntoView({behavior:'smooth', block:'start'});
+    // 자동으로 모든 섹션 쿼리 실행
+    queryAssets();
+    queryTagging();
+    queryExposures();
+    queryRules();
+  }, 400);
 }
 
 function changeProject() {
@@ -960,16 +968,17 @@ function resetQ(s) {
 async function queryAssets() {
   if (!checkReady()) return;
   loading('r-assets'); setSecErr('assets','');
-  const params = {
-    page:      document.getElementById('a-page').value,
-    page_size: document.getElementById('a-pp').value,
-  };
+  const params = {};
+  const page = document.getElementById('a-page').value;
+  const pp   = document.getElementById('a-pp').value;
   const type = document.getElementById('a-type').value;
   const risk = document.getElementById('a-risk').value;
   const q    = document.getElementById('a-q').value.trim();
-  if (type) params.type      = type;
-  if (risk) params.risk      = risk;
-  if (q)    params.filter    = q;
+  if (page && page !== '1') params.page = page;
+  if (pp)   params.pageSize = pp;
+  if (type) params.type     = type;
+  if (risk) params.severity = risk;
+  if (q)    params.query    = q;
 
   try {
     const data = await stFetch(`/v2/projects/${PROJECT.id}/assets`, params);
@@ -999,7 +1008,11 @@ async function queryAssets() {
     <div class="pager">
       <span class="pager-info">${items.length} assets (total: ${total})</span>
     </div>`;
-  } catch(e) { setSecErr('assets',e.message); empty('r-assets','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+  } catch(e) {
+    setSecErr('assets', e.message);
+    document.getElementById('r-assets').innerHTML = `<div class="sbox"><div class="sicon">⚠</div><div class="stxt">${e.message}</div></div>`;
+    log('✗ Assets: ' + e.message.split('\n')[0], 'err');
+  }
 }
 
 // ─────────────── QUERY: TAGGING ───────────────
@@ -1007,12 +1020,13 @@ async function queryAssets() {
 async function queryTagging() {
   if (!checkReady()) return;
   loading('r-tagging'); setSecErr('tagging','');
-  const params = {
-    page:      document.getElementById('t-page').value,
-    page_size: document.getElementById('t-pp').value,
-  };
-  const q = document.getElementById('t-q').value.trim();
-  if (q) params.filter = q;
+  const params = {};
+  const page = document.getElementById('t-page').value;
+  const pp   = document.getElementById('t-pp').value;
+  const q    = document.getElementById('t-q').value.trim();
+  if (page && page !== '1') params.page = page;
+  if (pp)   params.pageSize = pp;
+  if (q)    params.query    = q;
 
   try {
     const data = await stFetch(`/v2/projects/${PROJECT.id}/assets/tags`, params);
@@ -1038,7 +1052,11 @@ async function queryTagging() {
       </tr>`).join('')}</tbody>
     </table></div>
     <div class="pager"><span class="pager-info">${items.length} tags (total: ${total})</span></div>`;
-  } catch(e) { setSecErr('tagging',e.message); empty('r-tagging','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+  } catch(e) {
+    setSecErr('tagging', e.message);
+    document.getElementById('r-tagging').innerHTML = `<div class="sbox"><div class="sicon">⚠</div><div class="stxt">${e.message}</div></div>`;
+    log('✗ Tagging: ' + e.message.split('\n')[0], 'err');
+  }
 }
 
 // ─────────────── QUERY: EXPOSURES ───────────────
@@ -1046,18 +1064,19 @@ async function queryTagging() {
 async function queryExposures() {
   if (!checkReady()) return;
   loading('r-exposure'); setSecErr('exposure','');
-  const params = {
-    page:      document.getElementById('e-page').value,
-    page_size: document.getElementById('e-pp').value,
-  };
+  const params = {};
+  const page  = document.getElementById('e-page').value;
+  const pp    = document.getElementById('e-pp').value;
   const sev   = document.getElementById('e-sev').value;
   const port  = document.getElementById('e-port').value.trim();
   const proto = document.getElementById('e-proto').value;
   const asset = document.getElementById('e-asset').value.trim();
+  if (page && page !== '1') params.page = page;
+  if (pp)    params.pageSize = pp;
   if (sev)   params.severity = sev;
   if (port)  params.port     = port;
   if (proto) params.protocol = proto;
-  if (asset) params.asset    = asset;
+  if (asset) params.query    = asset;
 
   try {
     const data = await stFetch(`/v2/projects/${PROJECT.id}/exposures`, params);
@@ -1086,7 +1105,11 @@ async function queryExposures() {
       </tr>`).join('')}</tbody>
     </table></div>
     <div class="pager"><span class="pager-info">${items.length} exposures (total: ${total})</span></div>`;
-  } catch(e) { setSecErr('exposure',e.message); empty('r-exposure','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+  } catch(e) {
+    setSecErr('exposure', e.message);
+    document.getElementById('r-exposure').innerHTML = `<div class="sbox"><div class="sicon">⚠</div><div class="stxt">${e.message}</div></div>`;
+    log('✗ Exposure: ' + e.message.split('\n')[0], 'err');
+  }
 }
 
 // ─────────────── QUERY: RULES ───────────────
@@ -1094,14 +1117,15 @@ async function queryExposures() {
 async function queryRules() {
   if (!checkReady()) return;
   loading('r-rules'); setSecErr('rules','');
-  const params = {
-    page:      document.getElementById('ru-page').value,
-    page_size: document.getElementById('ru-pp').value,
-  };
+  const params = {};
+  const page   = document.getElementById('ru-page').value;
+  const pp     = document.getElementById('ru-pp').value;
   const q      = document.getElementById('ru-q').value.trim();
   const status = document.getElementById('ru-status').value;
   const sev    = document.getElementById('ru-sev').value;
-  if (q)      params.filter   = q;
+  if (page && page !== '1') params.page = page;
+  if (pp)     params.pageSize = pp;
+  if (q)      params.query    = q;
   if (status) params.status   = status;
   if (sev)    params.severity = sev;
 
@@ -1130,7 +1154,11 @@ async function queryRules() {
       </tr>`).join('')}</tbody>
     </table></div>
     <div class="pager"><span class="pager-info">${items.length} rules (total: ${total})</span></div>`;
-  } catch(e) { setSecErr('rules',e.message); empty('r-rules','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+  } catch(e) {
+    setSecErr('rules', e.message);
+    document.getElementById('r-rules').innerHTML = `<div class="sbox"><div class="sicon">⚠</div><div class="stxt">${e.message}</div></div>`;
+    log('✗ Rules: ' + e.message.split('\n')[0], 'err');
+  }
 }
 
 // ─────────────── DETAIL PANEL ───────────────
