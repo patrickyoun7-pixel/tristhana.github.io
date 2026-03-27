@@ -336,6 +336,28 @@ table.tbl tbody td:first-child{padding-left:16px;}
   </div>
 </div>
 
+<!-- ═══════ PROXY BAR ═══════ -->
+<div id="proxyBar" style="
+  background:#0d1018;border-bottom:1px solid rgba(255,255,255,.07);
+  padding:9px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+">
+  <span style="font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;">CORS Proxy</span>
+  <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+    <input type="checkbox" id="proxyEnabled" onchange="onProxyChange()"
+      style="accent-color:var(--amber);width:13px;height:13px;cursor:pointer;">
+    <span style="font-family:var(--mono);font-size:11px;color:var(--t2);">Enable</span>
+  </label>
+  <input type="text" id="proxyUrl" value="https://corsproxy.io/?" disabled
+    style="flex:1;max-width:360px;background:var(--bg);border:1px solid var(--line);
+      color:var(--t1);font-family:var(--mono);font-size:11px;padding:5px 10px;
+      border-radius:var(--r);outline:none;">
+  <button class="btn btn-ghost btn-sm" onclick="setProxy('https://corsproxy.io/?')">corsproxy.io</button>
+  <button class="btn btn-ghost btn-sm" onclick="setProxy('https://api.allorigins.win/raw?url=')">allorigins</button>
+  <span style="font-family:var(--mono);font-size:10px;color:var(--t3);margin-left:4px;">
+    ⚠ 브라우저 직접 호출 시 CORS 오류 발생 — <b style="color:var(--amber)">Enable 체크 후 Connect</b> 재클릭
+  </span>
+</div>
+
 <!-- ═══════ LOG BAR ═══════ -->
 <div id="logBar">
   <div class="log-head" onclick="toggleLog()">
@@ -627,6 +649,31 @@ table.tbl tbody td:first-child{padding-left:16px;}
 // ─────────────── CONFIG ───────────────
 const API_BASE = 'https://api.securitytrails.com';
 
+// ─────────────── PROXY ───────────────
+function onProxyChange() {
+  const on = document.getElementById('proxyEnabled').checked;
+  document.getElementById('proxyUrl').disabled = !on;
+  log(on ? '프록시 활성화 — Connect를 다시 클릭하세요' : '프록시 비활성화', on ? 'warn' : 'info');
+}
+function setProxy(url) {
+  document.getElementById('proxyEnabled').checked = true;
+  document.getElementById('proxyUrl').disabled = false;
+  document.getElementById('proxyUrl').value = url;
+  log(`프록시 설정: ${url}`, 'warn');
+  toast('프록시 설정됨 — Connect를 다시 클릭하세요', '');
+}
+function buildUrl(endpoint, params={}) {
+  const clean = Object.fromEntries(
+    Object.entries(params).filter(([,v]) => v !== '' && v != null)
+  );
+  let url = API_BASE + endpoint;
+  if (Object.keys(clean).length) url += '?' + new URLSearchParams(clean);
+  const proxyOn  = document.getElementById('proxyEnabled').checked;
+  const proxyPfx = document.getElementById('proxyUrl').value.trim();
+  if (proxyOn && proxyPfx) return proxyPfx + encodeURIComponent(url);
+  return url;
+}
+
 // ─────────────── STATE ───────────────
 let TOKEN = '';
 let PROJECT = null;   // { id, name }
@@ -674,28 +721,32 @@ function showErrBanner(msg) {
 function hideErrBanner() { document.getElementById('errBanner').style.display='none'; }
 
 // ─────────────── FETCH ───────────────
-// SecurityTrails ASI: APIKEY header, no proxy needed (CORS is open)
+// SecurityTrails ASI — APIKEY header
 async function stFetch(endpoint, params={}) {
   if (!TOKEN) throw new Error('API 키가 없습니다');
 
-  const clean = Object.fromEntries(
-    Object.entries(params).filter(([,v]) => v !== '' && v != null)
-  );
-  let url = API_BASE + endpoint;
-  if (Object.keys(clean).length) url += '?' + new URLSearchParams(clean);
+  const url = buildUrl(endpoint, params);
+  const clean = Object.fromEntries(Object.entries(params).filter(([,v])=>v!==''&&v!=null));
+  log(`→ GET ${endpoint}${Object.keys(clean).length?' +params':''}`, 'info');
 
-  log(`→ GET ${endpoint}${Object.keys(clean).length ? ' +params' : ''}`, 'info');
-
-  const resp = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'APIKEY': TOKEN,
-      'Content-Type': 'application/json'
+  let resp;
+  try {
+    resp = await fetch(url, {
+      method: 'GET',
+      headers: { 'APIKEY': TOKEN, 'Content-Type': 'application/json' }
+    });
+  } catch(e) {
+    const isCors = e.message.includes('Failed to fetch') || e.message.includes('NetworkError');
+    if (isCors) {
+      log('✗ CORS 차단 — 프록시를 활성화하세요', 'err');
+      throw new Error(
+        'CORS 오류: 브라우저가 API 직접 호출을 차단했습니다.\n' +
+        '→ 상단 "CORS Proxy" 에서 Enable 체크 → corsproxy.io 버튼 클릭 → Connect 재클릭'
+      );
     }
-  }).catch(e => {
     log(`✗ 네트워크 오류: ${e.message}`, 'err');
     throw new Error(`네트워크 오류: ${e.message}`);
-  });
+  }
 
   log(`← ${resp.status} ${resp.statusText}`, resp.ok ? 'ok' : 'err');
 
