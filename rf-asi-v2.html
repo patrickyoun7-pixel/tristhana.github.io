@@ -394,7 +394,7 @@ table.tbl tbody td:first-child{padding-left:16px;}
         <div class="section-icon">🖥</div>
         <div class="section-title-block">
           <div class="section-name">Assets</div>
-          <div class="section-desc">GET /v1/asi/projects/{id}/assets</div>
+          <div class="section-desc">GET /v2/asi/projects/{id}/assets</div>
         </div>
         <span class="section-count" id="cnt-assets"></span>
         <span class="section-chevron">▼</span>
@@ -453,7 +453,7 @@ table.tbl tbody td:first-child{padding-left:16px;}
         <div class="section-icon">🏷</div>
         <div class="section-title-block">
           <div class="section-name">Tagging</div>
-          <div class="section-desc">GET /v1/asi/projects/{id}/assets/tags</div>
+          <div class="section-desc">GET /v2/asi/projects/{id}/assets/tags</div>
         </div>
         <span class="section-count" id="cnt-tagging"></span>
         <span class="section-chevron">▼</span>
@@ -492,7 +492,7 @@ table.tbl tbody td:first-child{padding-left:16px;}
         <div class="section-icon">🔓</div>
         <div class="section-title-block">
           <div class="section-name">Exposure</div>
-          <div class="section-desc">GET /v1/asi/projects/{id}/exposures</div>
+          <div class="section-desc">GET /v2/asi/projects/{id}/exposures</div>
         </div>
         <span class="section-count" id="cnt-exposure"></span>
         <span class="section-chevron">▼</span>
@@ -555,7 +555,7 @@ table.tbl tbody td:first-child{padding-left:16px;}
         <div class="section-icon">📐</div>
         <div class="section-title-block">
           <div class="section-name">Rules</div>
-          <div class="section-desc">GET /v1/asi/projects/{id}/rules</div>
+          <div class="section-desc">GET /v2/asi/projects/{id}/rules</div>
         </div>
         <span class="section-count" id="cnt-rules"></span>
         <span class="section-chevron">▼</span>
@@ -743,11 +743,11 @@ async function doConnect() {
 
   const btn = document.getElementById('connectBtn');
   btn.disabled = true; btn.textContent = '연결 중…';
-  log('연결 시도: GET /v1/asi/projects', 'info');
+  log('연결 시도: GET /v2/asi/projects', 'info');
 
   try {
     // Validate via projects list (lightweight)
-    await stFetch('/v1/asi/projects', { page: 1, page_size: 1 });
+    await stFetch('/v2/asi/projects', { page: 1, page_size: 1 });
     setStatus(true);
     log('✓ 인증 성공', 'ok');
     toast('연결 성공', 'ok');
@@ -770,10 +770,10 @@ async function loadProjects() {
   const meta = document.getElementById('projectMeta');
   grid.innerHTML = `<div class="sbox"><div class="spinner"></div><div class="stxt">프로젝트 목록 로딩 중…</div></div>`;
   meta.textContent = '로딩 중…';
-  log('GET /v1/asi/projects', 'info');
+  log('GET /v2/asi/projects', 'info');
 
   try {
-    const data = await stFetch('/v1/asi/projects', { page: 1, page_size: 100 });
+    const data = await stFetch('/v2/asi/projects', { page: 1, page_size: 100 });
 
     // SecurityTrails response shape: { projects: [...], total: N }
     const list = data.projects || data.data || data.results || [];
@@ -905,7 +905,7 @@ function resetQ(s) {
 }
 
 // ─────────────── QUERY: ASSETS ───────────────
-// GET /v1/asi/projects/{project_id}/assets
+// GET /v2/asi/projects/{project_id}/assets
 async function queryAssets() {
   if (!checkReady()) return;
   loading('r-assets'); setSecErr('assets','');
@@ -921,7 +921,7 @@ async function queryAssets() {
   if (q)    params.filter    = q;
 
   try {
-    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/assets`, params);
+    const data = await stFetch(`/v2/asi/projects/${PROJECT.id}/assets`, params);
     const items = data.assets || data.records || data.data || data.results || [];
     const total = data.total ?? items.length;
     setCount('assets', total); DATA.assets = items;
@@ -952,7 +952,7 @@ async function queryAssets() {
 }
 
 // ─────────────── QUERY: TAGGING ───────────────
-// GET /v1/asi/projects/{project_id}/assets/tags
+// GET /v2/asi/projects/{project_id}/assets/tags
 async function queryTagging() {
   if (!checkReady()) return;
   loading('r-tagging'); setSecErr('tagging','');
@@ -964,7 +964,7 @@ async function queryTagging() {
   if (q) params.filter = q;
 
   try {
-    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/assets/tags`, params);
+    const data = await stFetch(`/v2/asi/projects/${PROJECT.id}/assets/tags`, params);
     const items = data.tags || data.records || data.data || data.results || [];
     const total = data.total ?? items.length;
     setCount('tagging', total); DATA.tagging = items;
@@ -991,7 +991,7 @@ async function queryTagging() {
 }
 
 // ─────────────── QUERY: EXPOSURES ───────────────
-// GET /v1/asi/projects/{project_id}/exposures
+// GET /v2/asi/projects/{project_id}/exposures
 async function queryExposures() {
   if (!checkReady()) return;
   loading('r-exposure'); setSecErr('exposure','');
@@ -1009,7 +1009,7 @@ async function queryExposures() {
   if (asset) params.asset    = asset;
 
   try {
-    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/exposures`, params);
+    const data = await stFetch(`/v2/asi/projects/${PROJECT.id}/exposures`, params);
     const items = data.exposures || data.records || data.data || data.results || [];
     const total = data.total ?? items.length;
     setCount('exposure', total); DATA.exposure = items;
@@ -1039,7 +1039,7 @@ async function queryExposures() {
 }
 
 // ─────────────── QUERY: RULES ───────────────
-// GET /v1/asi/projects/{project_id}/rules
+// GET /v2/asi/projects/{project_id}/rules
 async function queryRules() {
   if (!checkReady()) return;
   loading('r-rules'); setSecErr('rules','');
@@ -1055,7 +1055,7 @@ async function queryRules() {
   if (sev)    params.severity = sev;
 
   try {
-    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/rules`, params);
+    const data = await stFetch(`/v2/asi/projects/${PROJECT.id}/rules`, params);
     const items = data.rules || data.records || data.data || data.results || [];
     const total = data.total ?? items.length;
     setCount('rules', total); DATA.rules = items;
