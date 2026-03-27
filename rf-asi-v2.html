@@ -872,45 +872,40 @@ async function loadProjects() {
 }
 
 function selectProject(id, name) {
-  // 1) 상태 저장
-  PROJECT = { id: String(id), name };
+  // ── 1. 상태 저장 (동기)
+  PROJECT = { id: String(id), name: String(name) };
+  log('프로젝트 선택: ' + name + ' (ID: ' + id + ')', 'ok');
+  toast('"' + name + '" 로딩 중…', 'ok');
 
-  // 2) UI - 프로젝트 영역 숨기고 섹션 표시
+  // ── 2. UI 전환 (동기)
+  document.querySelectorAll('.project-card').forEach(function(c) {
+    c.classList.toggle('selected', c.dataset.id == String(id));
+  });
   document.getElementById('projectArea').style.display   = 'none';
   document.getElementById('projectBanner').style.display = 'flex';
   document.getElementById('sectionsArea').style.display  = 'block';
   document.getElementById('step2Row').style.display      = 'flex';
+  document.getElementById('bannerName').textContent      = name;
+  document.getElementById('bannerId').textContent        = 'ID: ' + id;
+  document.getElementById('step2Sub').textContent        = name;
+  document.getElementById('step1Num').className          = 'step-num';
 
-  // 3) 배너 내용
-  document.getElementById('bannerName').textContent = name;
-  document.getElementById('bannerId').textContent   = `ID: ${id}`;
-  document.getElementById('step2Sub').textContent   = name;
-  document.getElementById('step1Num').className     = 'step-num';
-
-  // 4) 카드 선택 표시
-  document.querySelectorAll('.project-card').forEach(c =>
-    c.classList.toggle('selected', c.dataset.id == id)
-  );
-
-  // 5) 모든 섹션 열기 + 로딩 스피너 즉시 표시
-  ['assets','tagging','exposure','rules'].forEach(s => {
+  // ── 3. 섹션 열기 + 스피너 표시 (동기)
+  ['assets','tagging','exposure','rules'].forEach(function(s) {
     openSec(s);
     setCount(s, null);
     setSecErr(s, '');
-    loading('r-' + s);   // ← 즉시 스피너 표시
+    document.getElementById('r-' + s).innerHTML =
+      '<div class="sbox"><div class="spinner"></div><div class="stxt">API 쿼리 중…</div></div>';
   });
 
-  log(`프로젝트 선택: "${name}" (ID: ${id})`, 'ok');
-  toast(`"${name}" 로딩 중…`, 'ok');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // 6) 스크롤 후 쿼리 — requestAnimationFrame으로 DOM 업데이트 완료 보장
-  requestAnimationFrame(() => {
-    document.getElementById('sec-assets').scrollIntoView({behavior:'smooth', block:'start'});
-    queryAssets();
-    queryTagging();
-    queryExposures();
-    queryRules();
-  });
+  // ── 4. 비동기 쿼리 실행 (각각 독립 실행)
+  queryAssets();
+  queryTagging();
+  queryExposures();
+  queryRules();
 }
 
 function changeProject() {
@@ -965,8 +960,9 @@ function empty(id, icon, msg) {
   document.getElementById(id).innerHTML = `<div class="sbox"><div class="sicon">${icon}</div><div class="stxt">${msg}</div></div>`;
 }
 function checkReady() {
-  if (!TOKEN)   { toast('먼저 API에 연결하세요','err');         return false; }
-  if (!PROJECT) { toast('프로젝트를 먼저 선택하세요','err');    return false; }
+  if (!TOKEN)   { log('checkReady: TOKEN 없음','err');   toast('먼저 API에 연결하세요','err');      return false; }
+  if (!PROJECT) { log('checkReady: PROJECT 없음','err'); toast('프로젝트를 먼저 선택하세요','err'); return false; }
+  log('checkReady OK — project=' + PROJECT.id, 'info');
   return true;
 }
 function resetQ(s) {
