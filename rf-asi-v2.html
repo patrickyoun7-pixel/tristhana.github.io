@@ -3,690 +3,371 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RF · Attack Surface Intelligence</title>
+<title>RF ASI · SecurityTrails Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════
-   DESIGN TOKENS
-═══════════════════════════════════════ */
 :root {
-  --red:        #e8001c;
-  --red-dim:    rgba(232,0,28,0.18);
-  --red-glow:   rgba(232,0,28,0.08);
-  --amber:      #ffb300;
-  --amber-dim:  rgba(255,179,0,0.15);
-  --green:      #00c97a;
-  --green-dim:  rgba(0,201,122,0.12);
-  --cyan:       #00c8d4;
-  --cyan-dim:   rgba(0,200,212,0.12);
-  --orange:     #ff6b35;
+  --red:#e8001c; --red-dim:rgba(232,0,28,.18); --red-glow:rgba(232,0,28,.08);
+  --amber:#ffb300; --amber-dim:rgba(255,179,0,.15);
+  --green:#00c97a; --green-dim:rgba(0,201,122,.12);
+  --cyan:#00c8d4;  --cyan-dim:rgba(0,200,212,.12);
+  --orange:#ff6b35;
+  --bg:#080a0f; --bg1:#0d1018; --bg2:#121520; --bg3:#181d2c;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.04);
+  --t1:#eef0f8; --t2:#8a93b8; --t3:#454e72; --t4:#2a3050;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --disp:'Bebas Neue',cursive;
+  --r:4px; --r2:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh;font-size:14px;line-height:1.5;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+  background-size:40px 40px;}
+#app{position:relative;z-index:1;}
 
-  --bg:         #080a0f;
-  --bg1:        #0d1018;
-  --bg2:        #121520;
-  --bg3:        #181d2c;
-  --bg4:        #1f2538;
+/* ── TOP BAR ── */
+#topbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg1);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 24px;height:58px;gap:14px;
+}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-hex{
+  width:30px;height:30px;background:var(--red);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  font-family:var(--disp);font-size:12px;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-name{font-family:var(--disp);font-size:18px;letter-spacing:.12em;}
+.logo-name em{color:var(--red);font-style:normal;}
+.logo-sub{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.08em;}
+.vdiv{width:1px;height:28px;background:var(--line);flex-shrink:0;}
 
-  --line:       rgba(255,255,255,0.07);
-  --line2:      rgba(255,255,255,0.04);
+.token-zone{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.token-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);white-space:nowrap;flex-shrink:0;}
+.token-wrap{position:relative;flex:1;max-width:480px;}
+.token-wrap input{
+  width:100%;background:var(--bg);border:1px solid var(--line);color:var(--t1);
+  font-family:var(--mono);font-size:12px;padding:8px 36px 8px 12px;
+  border-radius:var(--r);outline:none;
+  transition:border-color .2s,box-shadow .2s;letter-spacing:.04em;
+}
+.token-wrap input::placeholder{color:var(--t4);}
+.token-wrap input:focus{border-color:var(--red);box-shadow:0 0 0 2px var(--red-glow);}
+.token-eye{position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;}
+.token-eye:hover{color:var(--t2);}
 
-  --t1: #eef0f8;
-  --t2: #8a93b8;
-  --t3: #454e72;
-  --t4: #2a3050;
+.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;
+  border-radius:20px;background:var(--bg);border:1px solid var(--line);flex-shrink:0;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--t4);transition:all .3s;}
+.status-dot.on{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.status-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);}
+.status-label.on{color:var(--green);}
 
-  --mono: 'IBM Plex Mono', monospace;
-  --sans: 'IBM Plex Sans', sans-serif;
-  --disp: 'Bebas Neue', cursive;
+/* API meta badge */
+.api-badge{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+  background:var(--bg3);border:1px solid var(--line);
+  color:var(--t3);padding:4px 10px;border-radius:var(--r);
+  white-space:nowrap;flex-shrink:0;
+}
+.api-badge b{color:var(--cyan);}
 
-  --r: 4px;
-  --r2: 8px;
-}
+/* ── BUTTONS ── */
+.btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;white-space:nowrap;padding:7px 16px;
+  border-radius:var(--r);border:none;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.btn-primary{background:var(--red);color:#fff;}
+.btn-primary:hover{background:#c8001a;}
+.btn-primary:active{transform:scale(.97);}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--t3);color:var(--t1);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-sm{padding:5px 11px;font-size:10px;}
+.btn-icon{background:var(--bg3);border:1px solid var(--line);color:var(--t2);
+  padding:4px 9px;border-radius:var(--r);font-size:14px;cursor:pointer;transition:all .15s;}
+.btn-icon:hover{border-color:var(--t3);color:var(--t1);}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── LOG BAR ── */
+#logBar{
+  background:var(--bg1);border-bottom:1px solid var(--line);
+  font-size:0;overflow:hidden;max-height:0;
+  transition:max-height .3s ease;
+}
+#logBar.open{max-height:200px;}
+.log-head{
+  display:flex;align-items:center;gap:10px;padding:7px 24px;
+  background:var(--bg2);cursor:pointer;border-bottom:1px solid var(--line);
+}
+.log-head-txt{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;flex:1;}
+#logEntries{padding:8px 24px 12px;max-height:140px;overflow-y:auto;}
+.lent{display:flex;gap:10px;padding:3px 0;font-family:var(--mono);font-size:11px;line-height:1.5;border-bottom:1px solid var(--line2);}
+.lent:last-child{border-bottom:none;}
+.ltime{color:var(--t4);font-size:10px;white-space:nowrap;padding-top:1px;min-width:62px;}
+.lok{color:var(--green)}.lerr{color:#ff4d5e}.linfo{color:var(--cyan)}.lwarn{color:var(--amber)}
 
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--t1);
-  font-family: var(--sans);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* grid texture */
-body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* ═══════════════════════════════════════
-   LAYOUT SHELL
-═══════════════════════════════════════ */
-#app { position: relative; z-index: 1; }
-
-/* ═══════════════════════════════════════
-   TOP BAR
-═══════════════════════════════════════ */
-#topbar {
-  position: sticky; top: 0; z-index: 200;
-  background: var(--bg1);
-  border-bottom: 1px solid var(--line);
-  display: flex; align-items: center;
-  padding: 0 28px; height: 56px; gap: 20px;
-}
-
-.logo {
-  display: flex; align-items: center; gap: 10px;
-  flex-shrink: 0;
-}
-.logo-hex {
-  width: 28px; height: 28px;
-  background: var(--red);
-  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-  font-family: var(--disp);
-  font-size: 11px; color: #fff;
-  display: flex; align-items: center; justify-content: center;
-}
-.logo-name {
-  font-family: var(--disp);
-  font-size: 17px; letter-spacing: 0.12em;
-  color: var(--t1);
-}
-.logo-name em { color: var(--red); font-style: normal; }
-
-.topbar-divider {
-  width: 1px; height: 28px;
-  background: var(--line); flex-shrink: 0;
-}
-
-/* token zone */
-.token-zone {
-  display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
-}
-
-.token-label {
-  font-family: var(--mono);
-  font-size: 10px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--t3);
-  white-space: nowrap; flex-shrink: 0;
-}
-
-.token-wrap {
-  position: relative; flex: 1; max-width: 520px;
-}
-.token-wrap input {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  color: var(--t1);
-  font-family: var(--mono); font-size: 12px;
-  padding: 7px 36px 7px 12px;
-  border-radius: var(--r);
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-  letter-spacing: 0.04em;
-}
-.token-wrap input::placeholder { color: var(--t4); }
-.token-wrap input:focus {
-  border-color: var(--red);
-  box-shadow: 0 0 0 2px var(--red-glow);
-}
-.token-eye {
-  position: absolute; right: 8px; top: 50%;
-  transform: translateY(-50%);
-  background: none; border: none;
-  color: var(--t3); cursor: pointer; font-size: 13px; padding: 2px;
-}
-.token-eye:hover { color: var(--t2); }
-
-/* status pill */
-.status-pill {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  flex-shrink: 0;
-}
-.status-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--t4);
-  transition: background .3s, box-shadow .3s;
-}
-.status-dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-.status-label {
-  font-family: var(--mono); font-size: 10px;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--t3);
-}
-.status-label.on { color: var(--green); }
-
-/* ═══════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════ */
-.btn {
-  font-family: var(--mono); font-size: 11px;
-  font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; white-space: nowrap;
-  padding: 7px 18px; border-radius: var(--r);
-  border: none; cursor: pointer;
-  transition: all .15s; flex-shrink: 0;
-}
-.btn-primary { background: var(--red); color: #fff; }
-.btn-primary:hover { background: #c8001a; }
-.btn-primary:active { transform: scale(.97); }
-.btn-ghost {
-  background: transparent; color: var(--t2);
-  border: 1px solid var(--line);
-}
-.btn-ghost:hover { border-color: var(--t3); color: var(--t1); }
-.btn:disabled { opacity: .35; cursor: not-allowed; }
-
-.btn-sm { padding: 5px 12px; font-size: 10px; }
-.btn-icon {
-  background: var(--bg3); border: 1px solid var(--line);
-  color: var(--t2); padding: 5px 10px; border-radius: var(--r);
-  font-size: 14px; cursor: pointer; transition: all .15s;
-}
-.btn-icon:hover { border-color: var(--t3); color: var(--t1); }
-
-/* ═══════════════════════════════════════
-   MAIN CONTENT
-═══════════════════════════════════════ */
-#main { padding: 28px 28px 60px; max-width: 1440px; margin: 0 auto; }
-
-/* ═══════════════════════════════════════
-   STEP LABEL
-═══════════════════════════════════════ */
-.step-row {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 18px;
-}
-.step-num {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--bg3);
-  border: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-size: 11px;
-  color: var(--t3); flex-shrink: 0;
-}
-.step-num.active {
-  background: var(--red-dim);
-  border-color: var(--red);
-  color: var(--red);
-}
-.step-title {
-  font-family: var(--disp);
-  font-size: 20px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--t1);
-}
-.step-sub {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); letter-spacing: 0.08em; text-transform: uppercase;
-  margin-left: auto;
+/* ── ERR BANNER ── */
+#errBanner{
+  display:none;
+  background:rgba(232,0,28,.08);border-bottom:1px solid rgba(232,0,28,.25);
+  padding:12px 24px;
+  font-family:var(--mono);font-size:12px;color:#ff4d5e;
+  white-space:pre-line;line-height:1.8;
 }
 
-/* ═══════════════════════════════════════
-   PROJECT SELECTOR AREA
-═══════════════════════════════════════ */
-#projectArea { margin-bottom: 32px; }
+/* ── MAIN ── */
+#main{padding:26px 24px 60px;max-width:1440px;margin:0 auto;}
 
-.project-load-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 16px 20px;
-  background: var(--bg1);
-  border: 1px solid var(--line);
-  border-radius: var(--r2);
-}
+/* ── STEP ── */
+.step-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;color:var(--t3);flex-shrink:0;}
+.step-num.active{background:var(--red-dim);border-color:var(--red);color:var(--red);}
+.step-title{font-family:var(--disp);font-size:20px;letter-spacing:.08em;text-transform:uppercase;}
+.step-sub{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-left:auto;}
 
-.project-load-info {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--t3);
+/* ── PROJECT AREA ── */
+.load-row{
+  display:flex;align-items:center;gap:10px;padding:14px 18px;
+  background:var(--bg1);border:1px solid var(--line);border-radius:var(--r2);
 }
+.load-info{font-family:var(--mono);font-size:11px;color:var(--t3);}
+#projectGrid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:12px;margin-top:14px;
+}
+.project-card{
+  background:var(--bg1);border:1px solid var(--line);border-radius:var(--r2);
+  padding:18px 20px;cursor:pointer;position:relative;overflow:hidden;
+  transition:border-color .2s,background .2s,transform .15s;
+}
+.project-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--t4);transition:background .2s;}
+.project-card:hover{border-color:rgba(232,0,28,.4);background:var(--bg2);transform:translateY(-1px);}
+.project-card:hover::before{background:var(--red);}
+.project-card.selected{border-color:var(--red);background:var(--red-glow);}
+.project-card.selected::before{background:var(--red);box-shadow:0 0 8px var(--red);}
+.pc-check{position:absolute;top:14px;right:14px;width:18px;height:18px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:10px;display:none;align-items:center;justify-content:center;}
+.project-card.selected .pc-check{display:flex;}
+.pc-name{font-weight:600;font-size:14px;color:var(--t1);margin-bottom:5px;}
+.pc-id{font-family:var(--mono);font-size:10px;color:var(--t3);margin-bottom:10px;letter-spacing:.06em;}
+.pc-meta{display:flex;gap:6px;flex-wrap:wrap;}
+.pc-chip{background:var(--bg3);border:1px solid var(--line);border-radius:3px;
+  padding:2px 8px;font-family:var(--mono);font-size:10px;color:var(--t3);}
 
-#projectGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
+/* ── BANNER ── */
+#projectBanner{
+  display:none;align-items:center;gap:14px;padding:10px 18px;
+  background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--red);
+  border-radius:var(--r);margin-bottom:22px;
 }
+.pb-label{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;}
+.pb-name{font-weight:600;font-size:14px;color:var(--t1);}
+.pb-id{font-family:var(--mono);font-size:11px;color:var(--t3);}
 
-.project-card {
-  background: var(--bg1);
-  border: 1px solid var(--line);
-  border-radius: var(--r2);
-  padding: 18px 20px;
-  cursor: pointer;
-  transition: border-color .2s, background .2s, transform .15s;
-  position: relative; overflow: hidden;
+/* ── SECTIONS ── */
+#sectionsArea{display:none;}
+.section-block{margin-bottom:14px;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;background:var(--bg1);}
+.section-header{
+  display:flex;align-items:center;padding:0 18px;height:52px;
+  background:var(--bg2);border-bottom:1px solid var(--line);
+  cursor:pointer;user-select:none;gap:12px;transition:background .15s;
 }
-.project-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0;
-  width: 3px; height: 100%;
-  background: var(--t4);
-  transition: background .2s;
-}
-.project-card:hover {
-  border-color: rgba(232,0,28,.4);
-  background: var(--bg2);
-  transform: translateY(-1px);
-}
-.project-card:hover::before { background: var(--red); }
-.project-card.selected {
-  border-color: var(--red);
-  background: var(--red-glow);
-}
-.project-card.selected::before { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.section-header:hover{background:var(--bg3);}
+.section-icon{width:30px;height:30px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.section-title-block{flex:1;}
+.section-name{font-family:var(--disp);font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--t1);}
+.section-desc{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.06em;}
+.section-count{font-family:var(--mono);font-size:11px;color:var(--t3);margin-right:4px;}
+.section-ep{font-family:var(--mono);font-size:10px;color:var(--t4);margin-right:8px;display:none;}
+.section-block.open .section-ep{display:block;}
+.section-chevron{font-size:11px;color:var(--t3);transition:transform .25s;}
+.section-block.open .section-chevron{transform:rotate(180deg);}
+.section-body{display:none;padding:18px;}
+.section-block.open .section-body{display:block;}
 
-.pc-name {
-  font-family: var(--sans); font-weight: 600;
-  font-size: 14px; color: var(--t1); margin-bottom: 6px;
-}
-.pc-id {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); margin-bottom: 10px;
-  letter-spacing: 0.06em;
-}
-.pc-meta {
-  display: flex; gap: 8px; flex-wrap: wrap;
-}
-.pc-chip {
-  background: var(--bg3);
-  border: 1px solid var(--line);
-  border-radius: 3px; padding: 2px 8px;
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3);
-}
-.pc-check {
-  position: absolute; top: 14px; right: 16px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: var(--red);
-  color: white; font-size: 10px;
-  display: none; align-items: center; justify-content: center;
-}
-.project-card.selected .pc-check { display: flex; }
+/* colour coding */
+.section-block[data-s="assets"]   .section-icon{background:var(--cyan-dim);}
+.section-block[data-s="tagging"]  .section-icon{background:var(--amber-dim);}
+.section-block[data-s="exposure"] .section-icon{background:var(--red-dim);}
+.section-block[data-s="rules"]    .section-icon{background:var(--green-dim);}
+.section-block[data-s="assets"]   .section-header{border-left:3px solid var(--cyan);}
+.section-block[data-s="tagging"]  .section-header{border-left:3px solid var(--amber);}
+.section-block[data-s="exposure"] .section-header{border-left:3px solid var(--red);}
+.section-block[data-s="rules"]    .section-header{border-left:3px solid var(--green);}
 
-/* ═══════════════════════════════════════
-   QUERY SECTIONS (Assets/Tagging/Exposure/Rules)
-═══════════════════════════════════════ */
-#sectionsArea { display: none; }
-
-.section-block {
-  margin-bottom: 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--r2);
-  overflow: hidden;
-  background: var(--bg1);
+/* ── QUERY BAR ── */
+.qbar{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  padding:12px 14px;background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--r);margin-bottom:14px;
 }
-
-.section-header {
-  display: flex; align-items: center;
-  padding: 0 20px; height: 52px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-  user-select: none;
-  gap: 14px;
-  transition: background .15s;
+.qg{display:flex;align-items:center;gap:5px;}
+.ql{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.qi{
+  background:var(--bg2);border:1px solid var(--line);color:var(--t1);
+  font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:var(--r);
+  outline:none;transition:border-color .2s;
 }
-.section-header:hover { background: var(--bg3); }
+.qi::placeholder{color:var(--t4);}
+.qi:focus{border-color:var(--red);}
+select.qi{cursor:pointer;}
+.qdiv{width:1px;height:22px;background:var(--line);flex-shrink:0;}
+.qsp{flex:1;}
 
-.section-icon {
-  width: 32px; height: 32px;
-  border-radius: var(--r);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);}
+table.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+table.tbl thead th{
+  background:var(--bg);padding:9px 14px;font-family:var(--mono);font-size:10px;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--t3);
+  text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;
 }
+table.tbl thead th:first-child{padding-left:16px;}
+table.tbl tbody tr:hover{background:rgba(255,255,255,.02);}
+table.tbl tbody td{padding:10px 14px;color:var(--t2);border-bottom:1px solid var(--line2);vertical-align:middle;}
+table.tbl tbody tr:last-child td{border-bottom:none;}
+table.tbl tbody td:first-child{padding-left:16px;}
+.tm{font-family:var(--mono);font-size:11px;}
+.tm1{color:var(--t1);font-weight:500;}
 
-.section-title-block { flex: 1; }
-.section-name {
-  font-family: var(--disp);
-  font-size: 17px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--t1);
-}
-.section-desc {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); letter-spacing: 0.06em;
-  margin-top: 1px;
-}
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;
+  font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:3px;white-space:nowrap;}
+.badge-critical{background:rgba(232,0,28,.18);color:#ff4d5e;border:1px solid rgba(232,0,28,.3);}
+.badge-high{background:rgba(255,107,53,.15);color:var(--orange);border:1px solid rgba(255,107,53,.3);}
+.badge-medium{background:rgba(255,179,0,.13);color:var(--amber);border:1px solid rgba(255,179,0,.3);}
+.badge-low{background:rgba(0,201,122,.12);color:var(--green);border:1px solid rgba(0,201,122,.25);}
+.badge-info{background:rgba(0,200,212,.12);color:var(--cyan);border:1px solid rgba(0,200,212,.25);}
+.badge-neutral{background:var(--bg3);color:var(--t2);border:1px solid var(--line);}
 
-.section-count {
-  font-family: var(--mono); font-size: 12px;
-  color: var(--t3); margin-right: 6px;
-}
+/* ── STATES ── */
+.sbox{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:44px 20px;gap:10px;text-align:center;}
+.sicon{font-size:26px;opacity:.35;}
+.stxt{font-family:var(--mono);font-size:11px;color:var(--t3);letter-spacing:.06em;line-height:1.7;}
+.spinner{width:22px;height:22px;border:2px solid var(--line);border-top-color:var(--red);
+  border-radius:50%;animation:spin .65s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.section-chevron {
-  font-size: 12px; color: var(--t3);
-  transition: transform .25s;
-}
-.section-block.open .section-chevron { transform: rotate(180deg); }
+/* ── SCOREBAR ── */
+.sb{display:flex;align-items:center;gap:7px;min-width:100px;}
+.sb-t{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.sb-f{height:100%;border-radius:2px;}
+.sb-v{font-family:var(--mono);font-size:11px;color:var(--t2);min-width:22px;text-align:right;}
 
-.section-body {
-  display: none;
-  padding: 20px;
-}
-.section-block.open .section-body { display: block; }
+.pager{display:flex;align-items:center;padding:10px 14px;border-top:1px solid var(--line2);}
+.pager-info{font-family:var(--mono);font-size:10px;color:var(--t3);}
 
-/* colour coding per section */
-.section-block[data-section="assets"]   .section-icon { background: var(--cyan-dim); }
-.section-block[data-section="tagging"]  .section-icon { background: var(--amber-dim); }
-.section-block[data-section="exposure"] .section-icon { background: var(--red-dim); }
-.section-block[data-section="rules"]    .section-icon { background: var(--green-dim); }
-
-.section-block[data-section="assets"]   .section-header { border-left: 3px solid var(--cyan); }
-.section-block[data-section="tagging"]  .section-header { border-left: 3px solid var(--amber); }
-.section-block[data-section="exposure"] .section-header { border-left: 3px solid var(--red); }
-.section-block[data-section="rules"]    .section-header { border-left: 3px solid var(--green); }
-
-/* ═══════════════════════════════════════
-   QUERY BAR
-═══════════════════════════════════════ */
-.query-bar {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  align-items: center;
-  padding: 14px 16px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  margin-bottom: 16px;
+.err-bar{
+  background:rgba(232,0,28,.08);border:1px solid rgba(232,0,28,.25);
+  border-radius:var(--r);padding:10px 14px;font-family:var(--mono);font-size:11px;
+  color:#ff4d5e;margin-bottom:12px;white-space:pre-line;line-height:1.7;
 }
 
-.qb-group {
-  display: flex; align-items: center; gap: 6px;
-}
+/* ── DETAIL PANEL ── */
+#dOverlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:flex-end;}
+#dOverlay.open{display:flex;}
+#dPanel{width:460px;height:100vh;background:var(--bg1);border-left:1px solid var(--line);overflow-y:auto;animation:sld .22s ease;}
+@keyframes sld{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+.dp-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;
+  position:sticky;top:0;background:var(--bg1);z-index:10;}
+.dp-title{font-family:var(--disp);font-size:17px;letter-spacing:.08em;flex:1;}
+.dp-body{padding:18px 22px;}
+.dp-row{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:9px 0;border-bottom:1px solid var(--line2);gap:12px;}
+.dp-row:last-child{border-bottom:none;}
+.dp-key{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;flex-shrink:0;}
+.dp-val{font-family:var(--mono);font-size:11px;color:var(--t1);text-align:right;word-break:break-all;}
 
-.qb-label {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); text-transform: uppercase;
-  letter-spacing: 0.1em; white-space: nowrap;
-}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:22px;right:22px;z-index:9000;padding:10px 16px;
+  background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);
+  font-family:var(--mono);font-size:11px;color:var(--t1);
+  transform:translateY(14px);opacity:0;transition:all .3s;pointer-events:none;max-width:380px;}
+#toast.show{transform:none;opacity:1;}
+#toast.ok{border-color:var(--green);color:var(--green);}
+#toast.err{border-color:var(--red);color:#ff4d5e;}
 
-.qb-input {
-  background: var(--bg2);
-  border: 1px solid var(--line);
-  color: var(--t1);
-  font-family: var(--mono); font-size: 12px;
-  padding: 6px 12px;
-  border-radius: var(--r); outline: none;
-  transition: border-color .2s;
-}
-.qb-input::placeholder { color: var(--t4); }
-.qb-input:focus { border-color: var(--red); }
-
-select.qb-input { cursor: pointer; }
-
-.qb-divider {
-  width: 1px; height: 24px;
-  background: var(--line); flex-shrink: 0;
-}
-
-.qb-spacer { flex: 1; }
-
-/* ═══════════════════════════════════════
-   TABLE
-═══════════════════════════════════════ */
-.rf-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-}
-table.rf-table {
-  width: 100%; border-collapse: collapse;
-  font-size: 12px;
-}
-table.rf-table thead th {
-  background: var(--bg);
-  padding: 9px 14px;
-  font-family: var(--mono); font-size: 10px;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--t3); text-align: left;
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-table.rf-table thead th:first-child { padding-left: 16px; }
-table.rf-table tbody tr { transition: background .1s; }
-table.rf-table tbody tr:hover { background: rgba(255,255,255,.02); }
-table.rf-table tbody td {
-  padding: 10px 14px;
-  color: var(--t2);
-  border-bottom: 1px solid var(--line2);
-  vertical-align: middle;
-}
-table.rf-table tbody tr:last-child td { border-bottom: none; }
-table.rf-table tbody td:first-child { padding-left: 16px; }
-.td-mono { font-family: var(--mono); font-size: 11px; }
-.td-main { color: var(--t1); font-weight: 500; }
-
-/* ═══════════════════════════════════════
-   BADGES
-═══════════════════════════════════════ */
-.badge {
-  display: inline-flex; align-items: center;
-  font-family: var(--mono); font-size: 10px;
-  font-weight: 600; letter-spacing: 0.07em;
-  text-transform: uppercase; padding: 2px 8px;
-  border-radius: 3px; white-space: nowrap;
-}
-.badge-critical { background: rgba(232,0,28,.18); color: #ff4d5e; border: 1px solid rgba(232,0,28,.3); }
-.badge-high     { background: rgba(255,107,53,.15); color: var(--orange); border: 1px solid rgba(255,107,53,.3); }
-.badge-medium   { background: rgba(255,179,0,.13); color: var(--amber); border: 1px solid rgba(255,179,0,.3); }
-.badge-low      { background: rgba(0,201,122,.12); color: var(--green); border: 1px solid rgba(0,201,122,.25); }
-.badge-info     { background: rgba(0,200,212,.12); color: var(--cyan); border: 1px solid rgba(0,200,212,.25); }
-.badge-neutral  { background: var(--bg3); color: var(--t2); border: 1px solid var(--line); }
-
-/* ═══════════════════════════════════════
-   STATE MESSAGES
-═══════════════════════════════════════ */
-.state-box {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 48px 20px; gap: 10px;
-  text-align: center;
-}
-.state-icon { font-size: 28px; opacity: .35; }
-.state-txt {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--t3); letter-spacing: 0.06em;
-  line-height: 1.7;
-}
-.spinner {
-  width: 24px; height: 24px;
-  border: 2px solid var(--line);
-  border-top-color: var(--red);
-  border-radius: 50%;
-  animation: spin .65s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ═══════════════════════════════════════
-   SCORE BAR
-═══════════════════════════════════════ */
-.scorebar { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-.scorebar-track {
-  flex: 1; height: 3px;
-  background: var(--bg3); border-radius: 2px; overflow: hidden;
-}
-.scorebar-fill { height: 100%; border-radius: 2px; }
-.scorebar-val {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--t2); min-width: 24px; text-align: right;
-}
-
-/* ═══════════════════════════════════════
-   PAGINATION
-═══════════════════════════════════════ */
-.pager {
-  display: flex; align-items: center; justify-content: flex-end;
-  gap: 8px; padding: 12px 16px;
-  border-top: 1px solid var(--line2);
-  margin-top: 4px;
-}
-.pager-info {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); margin-right: auto;
-}
-
-/* ═══════════════════════════════════════
-   SELECTED PROJECT BANNER
-═══════════════════════════════════════ */
-#projectBanner {
-  display: none;
-  align-items: center; gap: 14px;
-  padding: 10px 18px;
-  background: var(--bg2);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--red);
-  border-radius: var(--r);
-  margin-bottom: 24px;
-}
-.pb-label { font-family: var(--mono); font-size: 10px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em; }
-.pb-name  { font-family: var(--sans); font-weight: 600; font-size: 14px; color: var(--t1); }
-.pb-id    { font-family: var(--mono); font-size: 11px; color: var(--t3); }
-
-/* ═══════════════════════════════════════
-   ERROR BAR
-═══════════════════════════════════════ */
-.err-bar {
-  background: rgba(232,0,28,.08);
-  border: 1px solid rgba(232,0,28,.25);
-  border-radius: var(--r);
-  padding: 10px 16px;
-  font-family: var(--mono); font-size: 11px;
-  color: #ff4d5e; margin-bottom: 14px;
-}
-
-/* ═══════════════════════════════════════
-   DETAIL PANEL (slide-in)
-═══════════════════════════════════════ */
-#detailOverlay {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,.6);
-  display: none; align-items: flex-start; justify-content: flex-end;
-}
-#detailOverlay.open { display: flex; }
-#detailPanel {
-  width: 480px; height: 100vh;
-  background: var(--bg1);
-  border-left: 1px solid var(--line);
-  overflow-y: auto;
-  animation: slideIn .25s ease;
-}
-@keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:none;opacity:1} }
-.dp-head {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; gap: 12px;
-  position: sticky; top: 0; background: var(--bg1); z-index: 10;
-}
-.dp-title { font-family: var(--disp); font-size: 18px; letter-spacing: 0.08em; flex: 1; }
-.dp-body { padding: 20px 24px; }
-.dp-row {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  padding: 10px 0; border-bottom: 1px solid var(--line2);
-  gap: 12px;
-}
-.dp-row:last-child { border-bottom: none; }
-.dp-key {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--t3); text-transform: uppercase; letter-spacing: 0.1em;
-  white-space: nowrap; flex-shrink: 0;
-}
-.dp-val {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--t1); text-align: right;
-  word-break: break-all;
-}
-
-/* ═══════════════════════════════════════
-   TOAST
-═══════════════════════════════════════ */
-#toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9000;
-  padding: 11px 18px;
-  background: var(--bg3);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  font-family: var(--mono); font-size: 11px; color: var(--t1);
-  transform: translateY(16px); opacity: 0;
-  transition: all .3s; pointer-events: none;
-  max-width: 380px;
-}
-#toast.show { transform: none; opacity: 1; }
-#toast.ok  { border-color: var(--green); color: var(--green); }
-#toast.err { border-color: var(--red);   color: #ff4d5e; }
-
-/* ═══════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════ */
 @media(max-width:768px){
-  #topbar { padding: 0 14px; gap: 10px; }
-  #main   { padding: 16px 14px; }
-  .token-zone { flex-wrap: wrap; }
+  #topbar{padding:0 14px;gap:8px;}
+  #main{padding:14px 14px 60px;}
+  .token-zone{flex-wrap:wrap;}
 }
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ──────────────── TOP BAR ──────────────── -->
+<!-- ═══════ TOP BAR ═══════ -->
 <div id="topbar">
   <div class="logo">
     <div class="logo-hex">RF</div>
-    <div class="logo-name"><em>Recorded Future</em> · ASI</div>
+    <div>
+      <div class="logo-name"><em>Recorded Future</em> · ASI</div>
+      <div class="logo-sub">api.securitytrails.com</div>
+    </div>
   </div>
-  <div class="topbar-divider"></div>
+  <div class="vdiv"></div>
 
   <div class="token-zone">
     <span class="token-label">API Key</span>
     <div class="token-wrap">
-      <input type="password" id="tokenInput" placeholder="Paste your Recorded Future API token…" autocomplete="off">
-      <button class="token-eye" onclick="toggleEye()" title="Show/Hide">👁</button>
+      <input type="password" id="tokenInput"
+        placeholder="SecurityTrails / RF ASI API 키 입력…" autocomplete="off">
+      <button class="token-eye" onclick="toggleEye()">👁</button>
     </div>
     <button class="btn btn-primary" id="connectBtn" onclick="doConnect()">Connect</button>
     <button class="btn btn-ghost btn-sm" onclick="clearToken()">Clear</button>
-    <div class="topbar-divider"></div>
+    <div class="api-badge">Header: <b>APIKEY</b></div>
+    <div class="vdiv"></div>
     <div class="status-pill">
       <div class="status-dot" id="statusDot"></div>
       <span class="status-label" id="statusLabel">Offline</span>
     </div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleLog()" style="font-size:10px;padding:5px 10px;">Logs</button>
   </div>
 </div>
 
-<!-- ──────────────── MAIN ──────────────── -->
+<!-- ═══════ LOG BAR ═══════ -->
+<div id="logBar">
+  <div class="log-head" onclick="toggleLog()">
+    <span class="log-head-txt" id="logTitle">Connection Log</span>
+    <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();clearLog()">Clear</button>
+    <span style="font-size:11px;color:var(--t3);margin-left:6px;">▲</span>
+  </div>
+  <div id="logEntries"></div>
+</div>
+
+<!-- ═══════ ERROR BANNER ═══════ -->
+<div id="errBanner"></div>
+
+<!-- ═══════ MAIN ═══════ -->
 <div id="main">
 
-  <!-- STEP 1: Project selection -->
+  <!-- STEP 1: Project -->
   <div id="projectArea">
     <div class="step-row">
       <div class="step-num active" id="step1Num">1</div>
       <div class="step-title">Select Project</div>
-      <div class="step-sub" id="projectMeta">Connect to load projects</div>
+      <div class="step-sub" id="projectMeta">API 연결 후 프로젝트 로드</div>
     </div>
-
-    <div class="project-load-row" id="loadRow">
-      <span class="project-load-info">Connect your API token above, then load your ASI projects.</span>
+    <div class="load-row">
+      <span class="load-info">API 키를 입력하고 Connect를 클릭한 다음 프로젝트를 불러오세요.</span>
       <div style="flex:1"></div>
-      <button class="btn btn-ghost btn-sm" id="loadProjectsBtn" onclick="loadProjects()" disabled>
-        ⟳ &nbsp;Load Projects
-      </button>
+      <button class="btn btn-ghost btn-sm" id="loadBtn" onclick="loadProjects()" disabled>⟳ &nbsp;Load Projects</button>
     </div>
-
     <div id="projectGrid"></div>
   </div>
 
-  <!-- STEP 2: Selected project banner -->
+  <!-- BANNER -->
   <div id="projectBanner">
     <div>
       <div class="pb-label">Active Project</div>
@@ -694,167 +375,133 @@ table.rf-table tbody td:first-child { padding-left: 16px; }
     </div>
     <div class="pb-id" id="bannerId"></div>
     <div style="flex:1"></div>
-    <button class="btn btn-ghost btn-sm" onclick="changeProject()">Change</button>
+    <button class="btn btn-ghost btn-sm" onclick="changeProject()">↩ Change</button>
   </div>
 
   <!-- STEP 2 label -->
   <div class="step-row" id="step2Row" style="display:none">
-    <div class="step-num active" id="step2Num">2</div>
+    <div class="step-num active">2</div>
     <div class="step-title">Query Attack Surface</div>
     <div class="step-sub" id="step2Sub"></div>
   </div>
 
-  <!-- ═════════════════════════════════════
-       SECTIONS
-  ═════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════
+       SECTION: ASSETS
+  ═══════════════════════════════════ -->
   <div id="sectionsArea">
-
-    <!-- ───── ASSETS ───── -->
-    <div class="section-block" data-section="assets" id="sec-assets">
-      <div class="section-header" onclick="toggleSection('assets')">
+    <div class="section-block" data-s="assets" id="sec-assets">
+      <div class="section-header" onclick="toggleSec('assets')">
         <div class="section-icon">🖥</div>
         <div class="section-title-block">
           <div class="section-name">Assets</div>
-          <div class="section-desc">Discovered hosts, IPs, domains, and CIDRs</div>
+          <div class="section-desc">GET /v1/asi/projects/{id}/assets</div>
         </div>
         <span class="section-count" id="cnt-assets"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
         <div id="err-assets"></div>
-        <div class="query-bar">
-          <div class="qb-group">
-            <span class="qb-label">Type</span>
-            <select class="qb-input" id="assetType" style="min-width:120px">
-              <option value="">All Types</option>
-              <option value="ip">IP Address</option>
+        <div class="qbar">
+          <div class="qg"><span class="ql">Type</span>
+            <select class="qi" id="a-type" style="min-width:110px">
+              <option value="">All</option>
+              <option value="ip">IP</option>
               <option value="domain">Domain</option>
               <option value="cidr">CIDR</option>
               <option value="url">URL</option>
             </select>
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Risk</span>
-            <select class="qb-input" id="assetRisk" style="min-width:120px">
-              <option value="">All Levels</option>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Risk</span>
+            <select class="qi" id="a-risk" style="min-width:110px">
+              <option value="">All</option>
               <option value="critical">Critical</option>
               <option value="high">High</option>
               <option value="medium">Medium</option>
               <option value="low">Low</option>
             </select>
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Search</span>
-            <input class="qb-input" id="assetSearch" type="text" placeholder="hostname, IP…" style="width:200px">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Search</span>
+            <input class="qi" id="a-q" type="text" placeholder="hostname, IP…" style="width:170px">
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Limit</span>
-            <select class="qb-input" id="assetLimit">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Page</span>
+            <input class="qi" id="a-page" type="number" value="1" min="1" style="width:60px">
+          </div>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Per page</span>
+            <select class="qi" id="a-pp">
               <option value="25">25</option>
               <option value="50" selected>50</option>
               <option value="100">100</option>
-              <option value="200">200</option>
             </select>
           </div>
-          <div class="qb-spacer"></div>
+          <div class="qsp"></div>
           <button class="btn btn-primary btn-sm" onclick="queryAssets()">Run Query</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetQuery('assets')">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetQ('assets')">Reset</button>
         </div>
-        <div id="assets-result">
-          <div class="state-box"><div class="state-icon">🖥</div><div class="state-txt">Set filters and click Run Query</div></div>
-        </div>
+        <div id="r-assets"><div class="sbox"><div class="sicon">🖥</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div></div>
       </div>
     </div>
 
-    <!-- ───── TAGGING ───── -->
-    <div class="section-block" data-section="tagging" id="sec-tagging">
-      <div class="section-header" onclick="toggleSection('tagging')">
+    <!-- ═══════════════════════════════════
+         SECTION: TAGGING
+    ═══════════════════════════════════ -->
+    <div class="section-block" data-s="tagging" id="sec-tagging">
+      <div class="section-header" onclick="toggleSec('tagging')">
         <div class="section-icon">🏷</div>
         <div class="section-title-block">
           <div class="section-name">Tagging</div>
-          <div class="section-desc">Asset tags, labels, and custom classifications</div>
+          <div class="section-desc">GET /v1/asi/projects/{id}/assets/tags</div>
         </div>
         <span class="section-count" id="cnt-tagging"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
         <div id="err-tagging"></div>
-        <div class="query-bar">
-          <div class="qb-group">
-            <span class="qb-label">Tag Name</span>
-            <input class="qb-input" id="tagSearch" type="text" placeholder="filter by tag name…" style="width:200px">
+        <div class="qbar">
+          <div class="qg"><span class="ql">Tag Search</span>
+            <input class="qi" id="t-q" type="text" placeholder="tag name…" style="width:170px">
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Category</span>
-            <select class="qb-input" id="tagCategory" style="min-width:140px">
-              <option value="">All Categories</option>
-              <option value="asset">Asset</option>
-              <option value="risk">Risk</option>
-              <option value="owner">Owner</option>
-              <option value="environment">Environment</option>
-              <option value="custom">Custom</option>
-            </select>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Page</span>
+            <input class="qi" id="t-page" type="number" value="1" min="1" style="width:60px">
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Limit</span>
-            <select class="qb-input" id="tagLimit">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Per page</span>
+            <select class="qi" id="t-pp">
               <option value="25">25</option>
               <option value="50" selected>50</option>
               <option value="100">100</option>
             </select>
           </div>
-          <div class="qb-spacer"></div>
+          <div class="qsp"></div>
           <button class="btn btn-primary btn-sm" onclick="queryTagging()">Run Query</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetQuery('tagging')">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetQ('tagging')">Reset</button>
         </div>
-        <div id="tagging-result">
-          <div class="state-box"><div class="state-icon">🏷</div><div class="state-txt">Set filters and click Run Query</div></div>
-        </div>
+        <div id="r-tagging"><div class="sbox"><div class="sicon">🏷</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div></div>
       </div>
     </div>
 
-    <!-- ───── EXPOSURE ───── -->
-    <div class="section-block" data-section="exposure" id="sec-exposure">
-      <div class="section-header" onclick="toggleSection('exposure')">
+    <!-- ═══════════════════════════════════
+         SECTION: EXPOSURE
+    ═══════════════════════════════════ -->
+    <div class="section-block" data-s="exposure" id="sec-exposure">
+      <div class="section-header" onclick="toggleSec('exposure')">
         <div class="section-icon">🔓</div>
         <div class="section-title-block">
           <div class="section-name">Exposure</div>
-          <div class="section-desc">Open ports, services, and internet-facing attack surface</div>
+          <div class="section-desc">GET /v1/asi/projects/{id}/exposures</div>
         </div>
         <span class="section-count" id="cnt-exposure"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
         <div id="err-exposure"></div>
-        <div class="query-bar">
-          <div class="qb-group">
-            <span class="qb-label">Port</span>
-            <input class="qb-input" id="expPort" type="text" placeholder="80, 443, 22…" style="width:100px">
-          </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Protocol</span>
-            <select class="qb-input" id="expProto" style="min-width:110px">
-              <option value="">All</option>
-              <option value="http">HTTP</option>
-              <option value="https">HTTPS</option>
-              <option value="ssh">SSH</option>
-              <option value="rdp">RDP</option>
-              <option value="ftp">FTP</option>
-              <option value="smtp">SMTP</option>
-              <option value="smb">SMB</option>
-              <option value="telnet">Telnet</option>
-            </select>
-          </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Severity</span>
-            <select class="qb-input" id="expSev" style="min-width:120px">
+        <div class="qbar">
+          <div class="qg"><span class="ql">Severity</span>
+            <select class="qi" id="e-sev" style="min-width:110px">
               <option value="">All</option>
               <option value="critical">Critical</option>
               <option value="high">High</option>
@@ -862,63 +509,74 @@ table.rf-table tbody td:first-child { padding-left: 16px; }
               <option value="low">Low</option>
             </select>
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Asset</span>
-            <input class="qb-input" id="expAsset" type="text" placeholder="host / IP…" style="width:160px">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Port</span>
+            <input class="qi" id="e-port" type="text" placeholder="80, 443…" style="width:90px">
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Limit</span>
-            <select class="qb-input" id="expLimit">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Protocol</span>
+            <select class="qi" id="e-proto" style="min-width:100px">
+              <option value="">All</option>
+              <option value="http">HTTP</option><option value="https">HTTPS</option>
+              <option value="ssh">SSH</option><option value="rdp">RDP</option>
+              <option value="ftp">FTP</option><option value="smtp">SMTP</option>
+              <option value="smb">SMB</option><option value="telnet">Telnet</option>
+            </select>
+          </div>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Asset</span>
+            <input class="qi" id="e-asset" type="text" placeholder="host / IP…" style="width:140px">
+          </div>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Page</span>
+            <input class="qi" id="e-page" type="number" value="1" min="1" style="width:60px">
+          </div>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Per page</span>
+            <select class="qi" id="e-pp">
               <option value="25">25</option>
               <option value="50" selected>50</option>
               <option value="100">100</option>
-              <option value="200">200</option>
             </select>
           </div>
-          <div class="qb-spacer"></div>
+          <div class="qsp"></div>
           <button class="btn btn-primary btn-sm" onclick="queryExposures()">Run Query</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetQuery('exposure')">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetQ('exposure')">Reset</button>
         </div>
-        <div id="exposure-result">
-          <div class="state-box"><div class="state-icon">🔓</div><div class="state-txt">Set filters and click Run Query</div></div>
-        </div>
+        <div id="r-exposure"><div class="sbox"><div class="sicon">🔓</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div></div>
       </div>
     </div>
 
-    <!-- ───── RULES ───── -->
-    <div class="section-block" data-section="rules" id="sec-rules">
-      <div class="section-header" onclick="toggleSection('rules')">
+    <!-- ═══════════════════════════════════
+         SECTION: RULES
+    ═══════════════════════════════════ -->
+    <div class="section-block" data-s="rules" id="sec-rules">
+      <div class="section-header" onclick="toggleSec('rules')">
         <div class="section-icon">📐</div>
         <div class="section-title-block">
           <div class="section-name">Rules</div>
-          <div class="section-desc">Detection rules, policy checks, and compliance controls</div>
+          <div class="section-desc">GET /v1/asi/projects/{id}/rules</div>
         </div>
         <span class="section-count" id="cnt-rules"></span>
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
         <div id="err-rules"></div>
-        <div class="query-bar">
-          <div class="qb-group">
-            <span class="qb-label">Search</span>
-            <input class="qb-input" id="ruleSearch" type="text" placeholder="rule name…" style="width:200px">
+        <div class="qbar">
+          <div class="qg"><span class="ql">Search</span>
+            <input class="qi" id="ru-q" type="text" placeholder="rule name…" style="width:170px">
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Status</span>
-            <select class="qb-input" id="ruleStatus" style="min-width:120px">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Status</span>
+            <select class="qi" id="ru-status" style="min-width:110px">
               <option value="">All</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-              <option value="draft">Draft</option>
             </select>
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Severity</span>
-            <select class="qb-input" id="ruleSev" style="min-width:120px">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Severity</span>
+            <select class="qi" id="ru-sev" style="min-width:110px">
               <option value="">All</option>
               <option value="critical">Critical</option>
               <option value="high">High</option>
@@ -926,22 +584,23 @@ table.rf-table tbody td:first-child { padding-left: 16px; }
               <option value="low">Low</option>
             </select>
           </div>
-          <div class="qb-divider"></div>
-          <div class="qb-group">
-            <span class="qb-label">Limit</span>
-            <select class="qb-input" id="ruleLimit">
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Page</span>
+            <input class="qi" id="ru-page" type="number" value="1" min="1" style="width:60px">
+          </div>
+          <div class="qdiv"></div>
+          <div class="qg"><span class="ql">Per page</span>
+            <select class="qi" id="ru-pp">
               <option value="25">25</option>
               <option value="50" selected>50</option>
               <option value="100">100</option>
             </select>
           </div>
-          <div class="qb-spacer"></div>
+          <div class="qsp"></div>
           <button class="btn btn-primary btn-sm" onclick="queryRules()">Run Query</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetQuery('rules')">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="resetQ('rules')">Reset</button>
         </div>
-        <div id="rules-result">
-          <div class="state-box"><div class="state-icon">📐</div><div class="state-txt">Set filters and click Run Query</div></div>
-        </div>
+        <div id="r-rules"><div class="sbox"><div class="sicon">📐</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div></div>
       </div>
     </div>
 
@@ -949,8 +608,8 @@ table.rf-table tbody td:first-child { padding-left: 16px; }
 </div><!-- /main -->
 
 <!-- DETAIL OVERLAY -->
-<div id="detailOverlay" onclick="closeDetail(event)">
-  <div id="detailPanel">
+<div id="dOverlay" onclick="closeDetail(event)">
+  <div id="dPanel">
     <div class="dp-head">
       <div class="dp-title" id="dpTitle">Detail</div>
       <button class="btn-icon" onclick="closeDetailPanel()">✕</button>
@@ -961,536 +620,492 @@ table.rf-table tbody td:first-child { padding-left: 16px; }
 
 <div id="toast"></div>
 
-<!-- ════════════════════════════════════════
+<!-- ══════════════════════════════════════
      JAVASCRIPT
-════════════════════════════════════════ -->
+══════════════════════════════════════ -->
 <script>
-/* ─────────────────────────────
-   STATE
-───────────────────────────── */
+// ─────────────── CONFIG ───────────────
+const API_BASE = 'https://api.securitytrails.com';
+
+// ─────────────── STATE ───────────────
 let TOKEN = '';
-let SELECTED_PROJECT = null;
+let PROJECT = null;   // { id, name }
 let DATA = { assets:[], tagging:[], exposure:[], rules:[] };
+let logOpen = false;
 
-const RF = 'https://api.recordedfuture.com';
-
-/* ─────────────────────────────
-   PERSIST TOKEN
-───────────────────────────── */
-(function init() {
-  const saved = sessionStorage.getItem('rf_token_v2');
-  if (saved) {
-    document.getElementById('tokenInput').value = saved;
-  }
-  document.getElementById('tokenInput').addEventListener('input', function() {
-    sessionStorage.setItem('rf_token_v2', this.value);
+// ─────────────── INIT ───────────────
+(function() {
+  const saved = sessionStorage.getItem('st_apikey');
+  if (saved) document.getElementById('tokenInput').value = saved;
+  document.getElementById('tokenInput').addEventListener('input', e =>
+    sessionStorage.setItem('st_apikey', e.target.value));
+  document.getElementById('tokenInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doConnect();
   });
 })();
 
-/* ─────────────────────────────
-   UTILS
-───────────────────────────── */
-function toast(msg, type='') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className='', 3500);
+// ─────────────── LOG ───────────────
+function toggleLog() {
+  logOpen = !logOpen;
+  document.getElementById('logBar').classList.toggle('open', logOpen);
+}
+function log(msg, type='info') {
+  if (!logOpen) { document.getElementById('logBar').classList.add('open'); logOpen = true; }
+  const wrap = document.getElementById('logEntries');
+  const d = document.createElement('div');
+  d.className = 'lent';
+  const t = new Date().toLocaleTimeString('ko-KR',{hour12:false});
+  d.innerHTML = `<span class="ltime">${t}</span><span class="l${type}">${msg}</span>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+  document.getElementById('logTitle').textContent = `Connection Log (${wrap.children.length})`;
+}
+function clearLog() {
+  document.getElementById('logEntries').innerHTML = '';
+  document.getElementById('logTitle').textContent = 'Connection Log';
 }
 
-function setErr(section, msg) {
-  const el = document.getElementById(`err-${section}`);
-  if (!el) return;
-  el.innerHTML = msg ? `<div class="err-bar">⚠ ${msg}</div>` : '';
+// ─────────────── ERROR BANNER ───────────────
+function showErrBanner(msg) {
+  const el = document.getElementById('errBanner');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(el._t); el._t = setTimeout(() => el.style.display='none', 20000);
+}
+function hideErrBanner() { document.getElementById('errBanner').style.display='none'; }
+
+// ─────────────── FETCH ───────────────
+// SecurityTrails ASI: APIKEY header, no proxy needed (CORS is open)
+async function stFetch(endpoint, params={}) {
+  if (!TOKEN) throw new Error('API 키가 없습니다');
+
+  const clean = Object.fromEntries(
+    Object.entries(params).filter(([,v]) => v !== '' && v != null)
+  );
+  let url = API_BASE + endpoint;
+  if (Object.keys(clean).length) url += '?' + new URLSearchParams(clean);
+
+  log(`→ GET ${endpoint}${Object.keys(clean).length ? ' +params' : ''}`, 'info');
+
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'APIKEY': TOKEN,
+      'Content-Type': 'application/json'
+    }
+  }).catch(e => {
+    log(`✗ 네트워크 오류: ${e.message}`, 'err');
+    throw new Error(`네트워크 오류: ${e.message}`);
+  });
+
+  log(`← ${resp.status} ${resp.statusText}`, resp.ok ? 'ok' : 'err');
+
+  if (resp.status === 401) throw new Error('401 Unauthorized — API 키를 확인하세요');
+  if (resp.status === 403) throw new Error('403 Forbidden — 이 엔드포인트에 접근 권한이 없습니다');
+  if (resp.status === 404) throw new Error('404 Not Found — 프로젝트 ID 또는 엔드포인트가 잘못되었습니다');
+  if (resp.status === 429) throw new Error('429 Rate Limit — API 요청 한도 초과, 잠시 후 재시도하세요');
+
+  if (!resp.ok) {
+    let detail = '';
+    try { const j = await resp.json(); detail = j.message || j.error || JSON.stringify(j); } catch{}
+    throw new Error(`HTTP ${resp.status}: ${detail || resp.statusText}`);
+  }
+
+  return resp.json();
 }
 
-function sevClass(s) {
-  if (!s) return 'neutral';
-  const v = s.toLowerCase();
-  if (v.includes('critical')) return 'critical';
-  if (v.includes('high'))     return 'high';
-  if (v.includes('medium') || v.includes('moderate')) return 'medium';
-  if (v.includes('low'))      return 'low';
-  return 'info';
-}
-
-function badge(label, cls) {
-  return `<span class="badge badge-${cls||sevClass(label)}">${label||'—'}</span>`;
-}
-
-function scorebar(val, max=100) {
-  const pct = Math.min(100, (val/max)*100);
-  const c = val>=80?'#e8001c': val>=60?'#ff6b35': val>=40?'#ffb300':'#00c97a';
-  return `<div class="scorebar">
-    <div class="scorebar-track"><div class="scorebar-fill" style="width:${pct}%;background:${c}"></div></div>
-    <span class="scorebar-val" style="color:${c}">${val}</span>
-  </div>`;
-}
-
-function loading(id) {
-  document.getElementById(id).innerHTML =
-    `<div class="state-box"><div class="spinner"></div><div class="state-txt">Querying API…</div></div>`;
-}
-
-function empty(id, icon, msg) {
-  document.getElementById(id).innerHTML =
-    `<div class="state-box"><div class="state-icon">${icon}</div><div class="state-txt">${msg}</div></div>`;
-}
-
-function setCount(section, n) {
-  const el = document.getElementById(`cnt-${section}`);
-  if (el) el.textContent = n != null ? `${n} results` : '';
-}
-
-/* ─────────────────────────────
-   API FETCH
-───────────────────────────── */
-async function rfFetch(endpoint, params={}, method='GET', body=null) {
-  if (!TOKEN) throw new Error('API token not set');
-  let url = RF + endpoint;
-  const filtered = Object.fromEntries(Object.entries(params).filter(([,v])=>v!==''&&v!=null));
-  if (method==='GET' && Object.keys(filtered).length)
-    url += '?' + new URLSearchParams(filtered);
-
-  const opts = {
-    method,
-    headers: { 'X-RFToken': TOKEN, 'Content-Type': 'application/json' }
-  };
-  if (method==='POST' && body) opts.body = JSON.stringify(body);
-
-  const r = await fetch(url, opts);
-  if (r.status===401) throw new Error('401 Unauthorized — invalid API token');
-  if (r.status===403) throw new Error('403 Forbidden — insufficient permissions');
-  if (r.status===404) throw new Error('404 Not Found — endpoint or resource not found');
-  if (r.status===429) throw new Error('429 Rate Limit exceeded');
-  if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
-  return r.json();
-}
-
-/* ─────────────────────────────
-   TOKEN UI
-───────────────────────────── */
+// ─────────────── TOKEN UI ───────────────
 function toggleEye() {
   const i = document.getElementById('tokenInput');
-  i.type = i.type==='password'?'text':'password';
+  i.type = i.type === 'password' ? 'text' : 'password';
 }
 function clearToken() {
   TOKEN = '';
   document.getElementById('tokenInput').value = '';
-  sessionStorage.removeItem('rf_token_v2');
-  setConnected(false);
+  sessionStorage.removeItem('st_apikey');
+  setStatus(false);
+  hideErrBanner();
   toast('Token cleared');
 }
-
-function setConnected(on) {
-  document.getElementById('statusDot').className = 'status-dot' + (on?' on':'');
-  const lbl = document.getElementById('statusLabel');
-  lbl.textContent = on ? 'Online' : 'Offline';
-  lbl.className = 'status-label' + (on?' on':'');
-  document.getElementById('loadProjectsBtn').disabled = !on;
+function setStatus(on) {
+  document.getElementById('statusDot').className   = 'status-dot' + (on ? ' on' : '');
+  const l = document.getElementById('statusLabel');
+  l.textContent = on ? 'Online' : 'Offline';
+  l.className   = 'status-label' + (on ? ' on' : '');
+  document.getElementById('loadBtn').disabled = !on;
 }
 
-/* ─────────────────────────────
-   CONNECT
-───────────────────────────── */
+// ─────────────── CONNECT ───────────────
 async function doConnect() {
-  const token = document.getElementById('tokenInput').value.trim();
-  if (!token) { toast('Enter an API token', 'err'); return; }
-  TOKEN = token;
+  const key = document.getElementById('tokenInput').value.trim();
+  if (!key) { toast('API 키를 입력하세요', 'err'); return; }
+  TOKEN = key;
+  hideErrBanner();
 
   const btn = document.getElementById('connectBtn');
-  btn.disabled = true; btn.textContent = 'Connecting…';
+  btn.disabled = true; btn.textContent = '연결 중…';
+  log('연결 시도: GET /v1/asi/projects', 'info');
+
   try {
-    // lightweight validation call
-    await rfFetch('/v1/asi/projects', { limit:1 });
-    setConnected(true);
-    toast('Connected — loading projects…', 'ok');
+    // Validate via projects list (lightweight)
+    await stFetch('/v1/asi/projects', { page: 1, page_size: 1 });
+    setStatus(true);
+    log('✓ 인증 성공', 'ok');
+    toast('연결 성공', 'ok');
     loadProjects();
   } catch(e) {
     TOKEN = '';
-    setConnected(false);
-    toast(e.message, 'err');
+    setStatus(false);
+    log('✗ ' + e.message.split('\n')[0], 'err');
+    showErrBanner('연결 실패: ' + e.message);
+    toast('연결 실패', 'err');
   } finally {
     btn.disabled = false; btn.textContent = 'Connect';
   }
 }
 
-/* ─────────────────────────────
-   PROJECTS
-───────────────────────────── */
+// ─────────────── PROJECTS ───────────────
 async function loadProjects() {
-  if (!TOKEN) { toast('Connect first', 'err'); return; }
+  if (!TOKEN) { toast('먼저 Connect를 클릭하세요', 'err'); return; }
   const grid = document.getElementById('projectGrid');
   const meta = document.getElementById('projectMeta');
-  grid.innerHTML = `<div class="state-box"><div class="spinner"></div><div class="state-txt">Loading projects…</div></div>`;
-  meta.textContent = 'Loading…';
+  grid.innerHTML = `<div class="sbox"><div class="spinner"></div><div class="stxt">프로젝트 목록 로딩 중…</div></div>`;
+  meta.textContent = '로딩 중…';
+  log('GET /v1/asi/projects', 'info');
 
   try {
-    const data = await rfFetch('/v1/asi/projects', { limit:100 });
-    const projects = data.projects || data.data || data.results || [];
+    const data = await stFetch('/v1/asi/projects', { page: 1, page_size: 100 });
 
-    meta.textContent = `${projects.length} project${projects.length!==1?'s':''} found`;
+    // SecurityTrails response shape: { projects: [...], total: N }
+    const list = data.projects || data.data || data.results || [];
+    const total = data.total ?? list.length;
 
-    if (!projects.length) {
-      grid.innerHTML = `<div class="state-box"><div class="state-icon">📁</div><div class="state-txt">No projects found for this account</div></div>`;
+    meta.textContent = `총 ${total}개 프로젝트`;
+    log(`✓ ${list.length}개 로드 (total: ${total})`, 'ok');
+
+    if (!list.length) {
+      grid.innerHTML = `<div class="sbox"><div class="sicon">📁</div><div class="stxt">이 계정에 ASI 프로젝트가 없습니다</div></div>`;
       return;
     }
 
-    grid.innerHTML = projects.map(p => {
-      const id   = p.id || p.project_id || p.uid || '—';
+    grid.innerHTML = list.map(p => {
+      const id   = p.id || p.project_id || '—';
       const name = p.name || p.project_name || id;
-      const assetCount = p.asset_count ?? p.assets ?? '';
-      const created    = p.created_at ? new Date(p.created_at).toLocaleDateString() : '';
-      return `<div class="project-card" onclick="selectProject('${id}', ${JSON.stringify(name).replace(/'/g,"&#39;")})"
-               data-id="${id}">
+      const chips = [
+        p.asset_count != null ? `${p.asset_count} assets` : null,
+        p.created_at  ? new Date(p.created_at).toLocaleDateString('ko-KR') : null,
+        p.status      ? p.status : null,
+        p.description ? p.description.slice(0,30) : null,
+      ].filter(Boolean);
+
+      return `<div class="project-card"
+          onclick="selectProject(${JSON.stringify(id)}, ${JSON.stringify(name)})"
+          data-id="${id}">
         <div class="pc-check">✓</div>
         <div class="pc-name">${name}</div>
-        <div class="pc-id">${id}</div>
+        <div class="pc-id">ID: ${id}</div>
         <div class="pc-meta">
-          ${assetCount ? `<span class="pc-chip">${assetCount} assets</span>` : ''}
-          ${created    ? `<span class="pc-chip">${created}</span>` : ''}
-          ${p.status   ? `<span class="pc-chip">${p.status}</span>` : ''}
-          ${p.tags?.length ? `<span class="pc-chip">${p.tags.length} tags</span>` : ''}
+          ${chips.map(c => `<span class="pc-chip">${c}</span>`).join('')}
         </div>
       </div>`;
     }).join('');
 
   } catch(e) {
-    grid.innerHTML = `<div class="err-bar">⚠ ${e.message}</div>`;
-    toast(e.message, 'err');
+    meta.textContent = '오류';
+    grid.innerHTML = `<div class="err-bar">${e.message}</div>`;
+    toast('프로젝트 로드 실패', 'err');
   }
 }
 
 function selectProject(id, name) {
-  SELECTED_PROJECT = { id, name };
-
-  // highlight selected card
-  document.querySelectorAll('.project-card').forEach(c => {
-    c.classList.toggle('selected', c.dataset.id === id);
-  });
-
-  // show banner
+  PROJECT = { id, name };
+  document.querySelectorAll('.project-card').forEach(c => c.classList.toggle('selected', c.dataset.id == id));
   document.getElementById('bannerName').textContent = name;
-  document.getElementById('bannerId').textContent = `ID: ${id}`;
+  document.getElementById('bannerId').textContent   = `ID: ${id}`;
   document.getElementById('projectBanner').style.display = 'flex';
-
-  // show sections
-  document.getElementById('sectionsArea').style.display = 'block';
-  document.getElementById('step2Row').style.display = 'flex';
-  document.getElementById('step2Sub').textContent = name;
-  document.getElementById('step1Num').className = 'step-num';
-  document.getElementById('step2Num').className = 'step-num active';
-
-  // collapse project area
-  document.getElementById('projectArea').style.display = 'none';
-
-  // reset all section results
-  ['assets','tagging','exposure','rules'].forEach(s => {
-    document.getElementById(`${s}-result`).innerHTML =
-      `<div class="state-box"><div class="state-icon">${{assets:'🖥',tagging:'🏷',exposure:'🔓',rules:'📐'}[s]}</div><div class="state-txt">Set filters and click Run Query</div></div>`;
-    setCount(s, null);
-    setErr(s,'');
+  document.getElementById('sectionsArea').style.display  = 'block';
+  document.getElementById('step2Row').style.display      = 'flex';
+  document.getElementById('step2Sub').textContent        = name;
+  document.getElementById('step1Num').className          = 'step-num';
+  document.getElementById('projectArea').style.display   = 'none';
+  // Reset all section results
+  const icons = {assets:'🖥',tagging:'🏷',exposure:'🔓',rules:'📐'};
+  Object.keys(icons).forEach(s => {
+    document.getElementById(`r-${s}`).innerHTML =
+      `<div class="sbox"><div class="sicon">${icons[s]}</div><div class="stxt">필터 설정 후 Run Query 클릭</div></div>`;
+    setCount(s, null); setSecErr(s, '');
   });
-
-  // auto-open first section
-  openSection('assets');
-
-  toast(`Project "${name}" selected`, 'ok');
+  openSec('assets');
+  log(`프로젝트 선택: "${name}" (${id})`, 'ok');
+  toast(`"${name}" 선택됨`, 'ok');
   setTimeout(() => document.getElementById('sec-assets').scrollIntoView({behavior:'smooth',block:'start'}), 200);
 }
 
 function changeProject() {
-  SELECTED_PROJECT = null;
-  document.getElementById('projectArea').style.display = 'block';
+  PROJECT = null;
+  document.getElementById('projectArea').style.display   = 'block';
   document.getElementById('projectBanner').style.display = 'none';
-  document.getElementById('sectionsArea').style.display = 'none';
-  document.getElementById('step2Row').style.display = 'none';
-  document.getElementById('step1Num').className = 'step-num active';
+  document.getElementById('sectionsArea').style.display  = 'none';
+  document.getElementById('step2Row').style.display      = 'none';
+  document.getElementById('step1Num').className          = 'step-num active';
   document.querySelectorAll('.project-card').forEach(c => c.classList.remove('selected'));
 }
 
-/* ─────────────────────────────
-   SECTION ACCORDION
-───────────────────────────── */
-function toggleSection(name) {
-  const block = document.getElementById(`sec-${name}`);
-  block.classList.toggle('open');
+// ─────────────── SECTION ACCORDION ───────────────
+function toggleSec(n) { document.getElementById(`sec-${n}`).classList.toggle('open'); }
+function openSec(n)   { document.getElementById(`sec-${n}`).classList.add('open'); }
+
+// ─────────────── UTILS ───────────────
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = `show ${type}`;
+  clearTimeout(el._t); el._t = setTimeout(() => el.className='', 3200);
 }
-function openSection(name) {
-  document.getElementById(`sec-${name}`).classList.add('open');
+function setSecErr(s, msg) {
+  const el = document.getElementById(`err-${s}`);
+  if (el) el.innerHTML = msg ? `<div class="err-bar">${msg}</div>` : '';
 }
-
-/* ─────────────────────────────
-   QUERY: ASSETS
-───────────────────────────── */
-async function queryAssets() {
-  if (!checkProject()) return;
-  loading('assets-result');
-  setErr('assets','');
-  const pid   = SELECTED_PROJECT.id;
-  const type  = document.getElementById('assetType').value;
-  const risk  = document.getElementById('assetRisk').value;
-  const q     = document.getElementById('assetSearch').value.trim();
-  const limit = document.getElementById('assetLimit').value;
-
-  try {
-    const data = await rfFetch(`/v1/asi/projects/${pid}/assets`,
-      { type, risk_level:risk, search:q, limit });
-    const items = data.assets || data.data || data.results || [];
-    setCount('assets', items.length);
-    DATA.assets = items;
-    renderAssets(items);
-  } catch(e) {
-    setErr('assets', e.message);
-    empty('assets-result','⚠','Query failed');
-    toast(e.message,'err');
-  }
+function setCount(s, n) {
+  const el = document.getElementById(`cnt-${s}`);
+  if (el) el.textContent = n != null ? `${n} results` : '';
 }
-
-function renderAssets(items) {
-  const el = document.getElementById('assets-result');
-  if (!items.length) { empty('assets-result','✅','No assets match the current filters'); return; }
-  el.innerHTML = `
-  <div class="rf-table-wrap">
-    <table class="rf-table">
-      <thead><tr>
-        <th>Asset / Host</th><th>Type</th><th>IP Address</th>
-        <th>Risk Score</th><th>Severity</th><th>Open Ports</th><th>CVEs</th><th></th>
-      </tr></thead>
-      <tbody>
-      ${items.map((a,i) => `<tr>
-        <td class="td-mono td-main" style="color:var(--cyan)">${a.host||a.name||a.fqdn||a.asset||'—'}</td>
-        <td>${a.type||a.asset_type||'—'}</td>
-        <td class="td-mono">${a.ip||a.ip_address||'—'}</td>
-        <td style="min-width:130px">${scorebar(a.risk_score||a.score||0)}</td>
-        <td>${badge(a.severity||a.risk_level)}</td>
-        <td class="td-mono" style="font-size:10px">${Array.isArray(a.open_ports)?a.open_ports.slice(0,5).join(', '):(a.open_ports||'—')}</td>
-        <td class="td-mono">${a.cve_count||a.vuln_count||'—'}</td>
-        <td><button class="btn-icon" onclick="showDetail('asset',${i})">›</button></td>
-      </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="pager">
-    <span class="pager-info">${items.length} assets returned</span>
-  </div>`;
+function sevClass(s) {
+  if (!s) return 'neutral';
+  const v = String(s).toLowerCase();
+  if (v.includes('critical')) return 'critical';
+  if (v.includes('high'))     return 'high';
+  if (v.includes('med'))      return 'medium';
+  if (v.includes('low'))      return 'low';
+  return 'info';
 }
-
-/* ─────────────────────────────
-   QUERY: TAGGING
-───────────────────────────── */
-async function queryTagging() {
-  if (!checkProject()) return;
-  loading('tagging-result');
-  setErr('tagging','');
-  const pid  = SELECTED_PROJECT.id;
-  const q    = document.getElementById('tagSearch').value.trim();
-  const cat  = document.getElementById('tagCategory').value;
-  const limit= document.getElementById('tagLimit').value;
-
-  try {
-    const data = await rfFetch(`/v1/asi/projects/${pid}/assets/tags`,
-      { search:q, category:cat, limit });
-    const items = data.tags || data.data || data.results || [];
-    setCount('tagging', items.length);
-    DATA.tagging = items;
-    renderTagging(items);
-  } catch(e) {
-    setErr('tagging', e.message);
-    empty('tagging-result','⚠','Query failed');
-    toast(e.message,'err');
-  }
+function badge(label, cls) {
+  return `<span class="badge badge-${cls || sevClass(label||'')}">${label || '—'}</span>`;
 }
-
-function renderTagging(items) {
-  if (!items.length) { empty('tagging-result','✅','No tags found for this project'); return; }
-  document.getElementById('tagging-result').innerHTML = `
-  <div class="rf-table-wrap">
-    <table class="rf-table">
-      <thead><tr>
-        <th>Tag Name</th><th>Category</th><th>Asset Count</th>
-        <th>Created By</th><th>Created At</th><th>Description</th><th></th>
-      </tr></thead>
-      <tbody>
-      ${items.map((t,i) => `<tr>
-        <td class="td-main" style="color:var(--amber)">${t.name||t.tag||t.label||'—'}</td>
-        <td>${badge(t.category||t.type||'Custom','neutral')}</td>
-        <td class="td-mono">${t.asset_count??t.count??'—'}</td>
-        <td class="td-mono" style="font-size:10px;color:var(--t3)">${t.created_by||t.author||'—'}</td>
-        <td class="td-mono" style="font-size:10px">${t.created_at?new Date(t.created_at).toLocaleDateString():'—'}</td>
-        <td style="max-width:220px;font-size:11px;color:var(--t2)">${(t.description||'—').slice(0,80)}</td>
-        <td><button class="btn-icon" onclick="showDetail('tagging',${i})">›</button></td>
-      </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="pager"><span class="pager-info">${items.length} tags returned</span></div>`;
+function scorebar(val) {
+  const v = Number(val) || 0;
+  const c = v>=80?'#e8001c':v>=60?'#ff6b35':v>=40?'#ffb300':'#00c97a';
+  return `<div class="sb"><div class="sb-t"><div class="sb-f" style="width:${Math.min(100,v)}%;background:${c}"></div></div><span class="sb-v" style="color:${c}">${v}</span></div>`;
 }
-
-/* ─────────────────────────────
-   QUERY: EXPOSURES
-───────────────────────────── */
-async function queryExposures() {
-  if (!checkProject()) return;
-  loading('exposure-result');
-  setErr('exposure','');
-  const pid   = SELECTED_PROJECT.id;
-  const port  = document.getElementById('expPort').value.trim();
-  const proto = document.getElementById('expProto').value;
-  const sev   = document.getElementById('expSev').value;
-  const asset = document.getElementById('expAsset').value.trim();
-  const limit = document.getElementById('expLimit').value;
-
-  try {
-    const data = await rfFetch(`/v1/asi/projects/${pid}/exposures`,
-      { port, protocol:proto, severity:sev, asset, limit });
-    const items = data.exposures || data.data || data.results || [];
-    setCount('exposure', items.length);
-    DATA.exposure = items;
-    renderExposures(items);
-  } catch(e) {
-    setErr('exposure', e.message);
-    empty('exposure-result','⚠','Query failed');
-    toast(e.message,'err');
-  }
+function loading(id) {
+  document.getElementById(id).innerHTML = `<div class="sbox"><div class="spinner"></div><div class="stxt">API 쿼리 중…</div></div>`;
 }
-
-function renderExposures(items) {
-  if (!items.length) { empty('exposure-result','✅','No exposures match the current filters'); return; }
-  document.getElementById('exposure-result').innerHTML = `
-  <div class="rf-table-wrap">
-    <table class="rf-table">
-      <thead><tr>
-        <th>Asset / Host</th><th>Port</th><th>Protocol</th><th>Service</th>
-        <th>Severity</th><th>Banner</th><th>First Seen</th><th>Last Seen</th><th></th>
-      </tr></thead>
-      <tbody>
-      ${items.map((e,i) => `<tr>
-        <td class="td-mono td-main" style="color:var(--cyan)">${e.host||e.asset||e.ip||'—'}</td>
-        <td class="td-mono"><b>${e.port||'—'}</b></td>
-        <td class="td-mono">${e.protocol||e.service_protocol||'—'}</td>
-        <td>${e.service||e.application||'—'}</td>
-        <td>${badge(e.severity||e.risk||e.risk_level)}</td>
-        <td class="td-mono" style="font-size:10px;color:var(--t3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.banner||e.banner_text||'—'}</td>
-        <td class="td-mono" style="font-size:10px">${e.first_seen?new Date(e.first_seen).toLocaleDateString():'—'}</td>
-        <td class="td-mono" style="font-size:10px">${e.last_seen?new Date(e.last_seen).toLocaleDateString():'—'}</td>
-        <td><button class="btn-icon" onclick="showDetail('exposure',${i})">›</button></td>
-      </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="pager"><span class="pager-info">${items.length} exposures returned</span></div>`;
+function empty(id, icon, msg) {
+  document.getElementById(id).innerHTML = `<div class="sbox"><div class="sicon">${icon}</div><div class="stxt">${msg}</div></div>`;
 }
-
-/* ─────────────────────────────
-   QUERY: RULES
-───────────────────────────── */
-async function queryRules() {
-  if (!checkProject()) return;
-  loading('rules-result');
-  setErr('rules','');
-  const pid    = SELECTED_PROJECT.id;
-  const q      = document.getElementById('ruleSearch').value.trim();
-  const status = document.getElementById('ruleStatus').value;
-  const sev    = document.getElementById('ruleSev').value;
-  const limit  = document.getElementById('ruleLimit').value;
-
-  try {
-    const data = await rfFetch(`/v1/asi/projects/${pid}/rules`,
-      { search:q, status, severity:sev, limit });
-    const items = data.rules || data.data || data.results || [];
-    setCount('rules', items.length);
-    DATA.rules = items;
-    renderRules(items);
-  } catch(e) {
-    setErr('rules', e.message);
-    empty('rules-result','⚠','Query failed');
-    toast(e.message,'err');
-  }
-}
-
-function renderRules(items) {
-  if (!items.length) { empty('rules-result','✅','No rules match the current filters'); return; }
-  document.getElementById('rules-result').innerHTML = `
-  <div class="rf-table-wrap">
-    <table class="rf-table">
-      <thead><tr>
-        <th>Rule Name</th><th>ID</th><th>Severity</th><th>Status</th>
-        <th>Category</th><th>Matches</th><th>Updated</th><th></th>
-      </tr></thead>
-      <tbody>
-      ${items.map((r,i) => `<tr>
-        <td class="td-main">${r.name||r.rule_name||'—'}</td>
-        <td class="td-mono" style="font-size:10px;color:var(--t3)">${r.id||r.rule_id||'—'}</td>
-        <td>${badge(r.severity||r.risk_level)}</td>
-        <td>${badge(r.status||r.state, r.status==='active'?'low':r.status==='inactive'?'neutral':'medium')}</td>
-        <td class="td-mono" style="font-size:11px">${r.category||r.type||'—'}</td>
-        <td class="td-mono">${r.match_count??r.matches??'—'}</td>
-        <td class="td-mono" style="font-size:10px">${r.updated_at?new Date(r.updated_at).toLocaleDateString():'—'}</td>
-        <td><button class="btn-icon" onclick="showDetail('rules',${i})">›</button></td>
-      </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-  <div class="pager"><span class="pager-info">${items.length} rules returned</span></div>`;
-}
-
-/* ─────────────────────────────
-   DETAIL PANEL
-───────────────────────────── */
-function showDetail(type, idx) {
-  const item = DATA[type === 'exposure' ? 'exposure' : type === 'tagging' ? 'tagging' : type + (type==='rules'?'':type==='asset'?'s':'s')][idx]
-    || DATA[type][idx]
-    || DATA[{asset:'assets',tagging:'tagging',exposure:'exposure',rules:'rules'}[type]||type][idx];
-  if (!item) return;
-
-  document.getElementById('dpTitle').textContent =
-    item.host||item.name||item.tag||item.rule_name||item.asset||`${type} #${idx+1}`;
-
-  const rows = Object.entries(item)
-    .filter(([k,v]) => v!==null && v!==undefined && v!=='')
-    .map(([k,v]) => {
-      let val = typeof v === 'object' ? JSON.stringify(v) : String(v);
-      if (val.length > 200) val = val.slice(0,200)+'…';
-      return `<div class="dp-row">
-        <span class="dp-key">${k.replace(/_/g,' ')}</span>
-        <span class="dp-val">${val}</span>
-      </div>`;
-    }).join('');
-
-  document.getElementById('dpBody').innerHTML = rows || '<div class="state-txt">No details available</div>';
-  document.getElementById('detailOverlay').classList.add('open');
-}
-
-function closeDetail(e) {
-  if (e.target === document.getElementById('detailOverlay')) closeDetailPanel();
-}
-function closeDetailPanel() {
-  document.getElementById('detailOverlay').classList.remove('open');
-}
-
-/* ─────────────────────────────
-   HELPERS
-───────────────────────────── */
-function checkProject() {
-  if (!TOKEN) { toast('Connect API first','err'); return false; }
-  if (!SELECTED_PROJECT) { toast('Select a project first','err'); return false; }
+function checkReady() {
+  if (!TOKEN)   { toast('먼저 API에 연결하세요','err');         return false; }
+  if (!PROJECT) { toast('프로젝트를 먼저 선택하세요','err');    return false; }
   return true;
 }
-
-function resetQuery(section) {
-  const selects = document.querySelectorAll(`#sec-${section} select`);
-  const inputs  = document.querySelectorAll(`#sec-${section} input[type=text]`);
-  selects.forEach(s => s.selectedIndex=0);
-  inputs.forEach(i  => i.value='');
+function resetQ(s) {
+  document.querySelectorAll(`#sec-${s} select`).forEach(el => el.selectedIndex=0);
+  document.querySelectorAll(`#sec-${s} input[type=text]`).forEach(el => el.value='');
+  document.querySelectorAll(`#sec-${s} input[type=number]`).forEach(el => {
+    if (el.id.endsWith('-page')) el.value='1';
+  });
 }
 
-/* ─────────────────────────────
-   ENTER KEY
-───────────────────────────── */
-document.getElementById('tokenInput').addEventListener('keydown', e => {
-  if (e.key==='Enter') doConnect();
-});
+// ─────────────── QUERY: ASSETS ───────────────
+// GET /v1/asi/projects/{project_id}/assets
+async function queryAssets() {
+  if (!checkReady()) return;
+  loading('r-assets'); setSecErr('assets','');
+  const params = {
+    page:      document.getElementById('a-page').value,
+    page_size: document.getElementById('a-pp').value,
+  };
+  const type = document.getElementById('a-type').value;
+  const risk = document.getElementById('a-risk').value;
+  const q    = document.getElementById('a-q').value.trim();
+  if (type) params.type      = type;
+  if (risk) params.risk      = risk;
+  if (q)    params.filter    = q;
+
+  try {
+    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/assets`, params);
+    const items = data.assets || data.records || data.data || data.results || [];
+    const total = data.total ?? items.length;
+    setCount('assets', total); DATA.assets = items;
+    log(`Assets: ${items.length} / total ${total}`, 'ok');
+    if (!items.length) { empty('r-assets','✅','결과 없음'); return; }
+    document.getElementById('r-assets').innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>Asset / Host</th><th>Type</th><th>IP Address</th>
+        <th>Risk Score</th><th>Severity</th><th>Ports</th><th>CVEs</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>${items.map((a,i) => `<tr>
+        <td class="tm tm1" style="color:var(--cyan)">${a.hostname||a.host||a.name||a.ip_address||a.ip||'—'}</td>
+        <td class="tm">${a.type||a.asset_type||'—'}</td>
+        <td class="tm">${a.ip_address||a.ip||'—'}</td>
+        <td>${scorebar(a.risk_score||a.risk||a.score||0)}</td>
+        <td>${badge(a.severity||a.risk_level)}</td>
+        <td class="tm" style="font-size:10px">${Array.isArray(a.ports)?a.ports.slice(0,5).join(', '):(a.open_ports||'—')}</td>
+        <td class="tm">${a.cve_count||a.vulnerabilities||'—'}</td>
+        <td>${badge(a.status, a.status==='active'?'low':'neutral')}</td>
+        <td><button class="btn-icon" onclick="showDetail('assets',${i})">›</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div class="pager">
+      <span class="pager-info">${items.length} assets (total: ${total})</span>
+    </div>`;
+  } catch(e) { setSecErr('assets',e.message); empty('r-assets','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+}
+
+// ─────────────── QUERY: TAGGING ───────────────
+// GET /v1/asi/projects/{project_id}/assets/tags
+async function queryTagging() {
+  if (!checkReady()) return;
+  loading('r-tagging'); setSecErr('tagging','');
+  const params = {
+    page:      document.getElementById('t-page').value,
+    page_size: document.getElementById('t-pp').value,
+  };
+  const q = document.getElementById('t-q').value.trim();
+  if (q) params.filter = q;
+
+  try {
+    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/assets/tags`, params);
+    const items = data.tags || data.records || data.data || data.results || [];
+    const total = data.total ?? items.length;
+    setCount('tagging', total); DATA.tagging = items;
+    log(`Tags: ${items.length} / total ${total}`, 'ok');
+    if (!items.length) { empty('r-tagging','✅','태그 없음'); return; }
+    document.getElementById('r-tagging').innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>Tag Name</th><th>Color</th><th>Asset Count</th>
+        <th>Created At</th><th>Updated At</th><th></th>
+      </tr></thead>
+      <tbody>${items.map((t,i) => `<tr>
+        <td class="tm1" style="color:var(--amber)">${t.name||t.tag||t.label||'—'}</td>
+        <td><span style="display:inline-block;width:14px;height:14px;border-radius:3px;
+          background:${t.color||'#454e72'};vertical-align:middle;border:1px solid rgba(255,255,255,.1)"></span></td>
+        <td class="tm">${t.asset_count??t.count??'—'}</td>
+        <td class="tm" style="font-size:10px">${t.created_at?new Date(t.created_at).toLocaleDateString('ko-KR'):'—'}</td>
+        <td class="tm" style="font-size:10px">${t.updated_at?new Date(t.updated_at).toLocaleDateString('ko-KR'):'—'}</td>
+        <td><button class="btn-icon" onclick="showDetail('tagging',${i})">›</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span class="pager-info">${items.length} tags (total: ${total})</span></div>`;
+  } catch(e) { setSecErr('tagging',e.message); empty('r-tagging','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+}
+
+// ─────────────── QUERY: EXPOSURES ───────────────
+// GET /v1/asi/projects/{project_id}/exposures
+async function queryExposures() {
+  if (!checkReady()) return;
+  loading('r-exposure'); setSecErr('exposure','');
+  const params = {
+    page:      document.getElementById('e-page').value,
+    page_size: document.getElementById('e-pp').value,
+  };
+  const sev   = document.getElementById('e-sev').value;
+  const port  = document.getElementById('e-port').value.trim();
+  const proto = document.getElementById('e-proto').value;
+  const asset = document.getElementById('e-asset').value.trim();
+  if (sev)   params.severity = sev;
+  if (port)  params.port     = port;
+  if (proto) params.protocol = proto;
+  if (asset) params.asset    = asset;
+
+  try {
+    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/exposures`, params);
+    const items = data.exposures || data.records || data.data || data.results || [];
+    const total = data.total ?? items.length;
+    setCount('exposure', total); DATA.exposure = items;
+    log(`Exposures: ${items.length} / total ${total}`, 'ok');
+    if (!items.length) { empty('r-exposure','✅','결과 없음'); return; }
+    document.getElementById('r-exposure').innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>Asset / Host</th><th>Port</th><th>Protocol</th><th>Service</th>
+        <th>Severity</th><th>CVE</th><th>Banner</th><th>First Seen</th><th>Last Seen</th><th></th>
+      </tr></thead>
+      <tbody>${items.map((e,i) => `<tr>
+        <td class="tm tm1" style="color:var(--cyan)">${e.hostname||e.host||e.asset||e.ip_address||e.ip||'—'}</td>
+        <td class="tm"><b>${e.port||'—'}</b></td>
+        <td class="tm">${e.protocol||'—'}</td>
+        <td>${e.service||e.product||'—'}</td>
+        <td>${badge(e.severity||e.risk_level||e.risk)}</td>
+        <td class="tm" style="font-size:10px;color:var(--amber)">${e.cve_id||e.cve||'—'}</td>
+        <td class="tm" style="font-size:10px;color:var(--t3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.banner||e.banner_text||'—'}</td>
+        <td class="tm" style="font-size:10px">${e.first_seen?new Date(e.first_seen).toLocaleDateString('ko-KR'):'—'}</td>
+        <td class="tm" style="font-size:10px">${e.last_seen?new Date(e.last_seen).toLocaleDateString('ko-KR'):'—'}</td>
+        <td><button class="btn-icon" onclick="showDetail('exposure',${i})">›</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span class="pager-info">${items.length} exposures (total: ${total})</span></div>`;
+  } catch(e) { setSecErr('exposure',e.message); empty('r-exposure','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+}
+
+// ─────────────── QUERY: RULES ───────────────
+// GET /v1/asi/projects/{project_id}/rules
+async function queryRules() {
+  if (!checkReady()) return;
+  loading('r-rules'); setSecErr('rules','');
+  const params = {
+    page:      document.getElementById('ru-page').value,
+    page_size: document.getElementById('ru-pp').value,
+  };
+  const q      = document.getElementById('ru-q').value.trim();
+  const status = document.getElementById('ru-status').value;
+  const sev    = document.getElementById('ru-sev').value;
+  if (q)      params.filter   = q;
+  if (status) params.status   = status;
+  if (sev)    params.severity = sev;
+
+  try {
+    const data = await stFetch(`/v1/asi/projects/${PROJECT.id}/rules`, params);
+    const items = data.rules || data.records || data.data || data.results || [];
+    const total = data.total ?? items.length;
+    setCount('rules', total); DATA.rules = items;
+    log(`Rules: ${items.length} / total ${total}`, 'ok');
+    if (!items.length) { empty('r-rules','✅','결과 없음'); return; }
+    document.getElementById('r-rules').innerHTML = `
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr>
+        <th>Rule Name</th><th>ID</th><th>Severity</th><th>Status</th>
+        <th>Category</th><th>Hits / 7d</th><th>Updated</th><th></th>
+      </tr></thead>
+      <tbody>${items.map((r,i) => `<tr>
+        <td class="tm1">${r.name||r.rule_name||'—'}</td>
+        <td class="tm" style="font-size:10px;color:var(--t3)">${r.id||r.rule_id||'—'}</td>
+        <td>${badge(r.severity||r.risk_level)}</td>
+        <td>${badge(r.status||r.state, r.status==='active'?'low':r.status==='inactive'?'neutral':'medium')}</td>
+        <td class="tm" style="font-size:11px">${r.category||r.type||'—'}</td>
+        <td class="tm">${r.hits_7d??r.match_count??r.matches??'—'}</td>
+        <td class="tm" style="font-size:10px">${r.updated_at?new Date(r.updated_at).toLocaleDateString('ko-KR'):'—'}</td>
+        <td><button class="btn-icon" onclick="showDetail('rules',${i})">›</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div class="pager"><span class="pager-info">${items.length} rules (total: ${total})</span></div>`;
+  } catch(e) { setSecErr('rules',e.message); empty('r-rules','⚠','쿼리 실패'); toast('쿼리 실패','err'); }
+}
+
+// ─────────────── DETAIL PANEL ───────────────
+function showDetail(type, idx) {
+  const item = DATA[type][idx]; if (!item) return;
+  document.getElementById('dpTitle').textContent =
+    item.hostname||item.host||item.name||item.tag||item.rule_name||item.ip||`${type} #${idx+1}`;
+  document.getElementById('dpBody').innerHTML =
+    Object.entries(item)
+      .filter(([,v]) => v != null && v !== '')
+      .map(([k,v]) => {
+        let val = typeof v === 'object' ? JSON.stringify(v,null,2) : String(v);
+        if (val.length > 400) val = val.slice(0,400)+'…';
+        return `<div class="dp-row">
+          <span class="dp-key">${k.replace(/_/g,' ')}</span>
+          <span class="dp-val">${val}</span>
+        </div>`;
+      }).join('') || '<div class="stxt">상세 정보 없음</div>';
+  document.getElementById('dOverlay').classList.add('open');
+}
+function closeDetail(e) {
+  if (e.target === document.getElementById('dOverlay')) closeDetailPanel();
+}
+function closeDetailPanel() {
+  document.getElementById('dOverlay').classList.remove('open');
+}
 </script>
 </body>
 </html>
