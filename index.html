@@ -1080,30 +1080,19 @@
     }
 
     .location-map-embed {
-      position: relative;
-      height: 240px;
       margin-bottom: 1.8rem;
       border: 1px solid rgba(55,178,148,0.15);
       overflow: hidden;
+      line-height: 0;
     }
 
-    .map-open-link {
-      position: absolute;
-      bottom: 0.7rem;
-      right: 0.8rem;
-      background: rgba(8,8,8,0.82);
-      border: 1px solid rgba(55,178,148,0.35);
-      color: var(--mint);
-      font-family: 'Gilroy', sans-serif;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      padding: 0.3rem 0.7rem;
-      text-decoration: none;
-      transition: background 0.2s;
-      backdrop-filter: blur(4px);
+    .location-map-embed .root_daum_roughmap {
+      width: 100% !important;
     }
 
-    .map-open-link:hover { background: rgba(55,178,148,0.12); }
+    .location-map-embed img {
+      max-width: 100%;
+    }
 
     .location-info { display: flex; flex-direction: column; gap: 0.8rem; }
 
@@ -2814,11 +2803,11 @@
     <div class="essence-asana">
       <div class="asana-frame">
         <div class="asana-photo">
-          <img src="images/essense-asana.jpg" alt="Ashtanga yoga Bakasana practice at Tristhana Yoga" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;">
+          <img src="images/essense-asana2.jpg" alt="Ashtanga yoga Krounchasana practice at Tristhana Yoga" style="width:100%;height:100%;object-fit:cover;object-position:40% 18%;display:block;">
         </div>
         <div class="asana-label">
-          <span class="asana-name-en">Bakasana</span>
-          <span class="asana-name-kr" data-i18n="asana_name_kr">바카사나</span>
+          <span class="asana-name-en">Krounchasana</span>
+          <span class="asana-name-kr" data-i18n="asana_name_kr">크라운차사나</span>
         </div>
       </div>
     </div>
@@ -3452,20 +3441,16 @@
 
       <div class="location-card" id="contact">
         <div class="location-map-embed">
-          <iframe
-            src="https://map.kakao.com/link/map/에이치스퀘어S동,37.394763,127.111058/1"
-            width="100%"
-            height="100%"
-            frameborder="0"
-            allowfullscreen
-            loading="lazy"
-            title="Tristhana Yoga 위치"
-            style="border:0;display:block;">
-          </iframe>
-          <a href="https://map.kakao.com/link/to/트리스타나요가,37.394763,127.111058"
-             target="_blank"
-             class="map-open-link"
-             data-i18n="map_open">카카오맵에서 열기 →</a>
+          <div id="daumRoughmapContainer1774704241260" class="root_daum_roughmap root_daum_roughmap_landing"></div>
+          <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"></script>
+          <script charset="UTF-8">
+            new daum.roughmap.Lander({
+              "timestamp": "1774704241260",
+              "key": "k598xryqq68",
+              "mapWidth": "640",
+              "mapHeight": "360"
+            }).render();
+          </script>
         </div>
         <div class="location-info">
           <div class="loc-row">
@@ -3611,7 +3596,7 @@
       pillar3_title: 'Drishti — 응시점',
       pillar3_desc: '각 자세마다 정해진 시선의 방향. 외부로 흩어지는 주의를 내면으로 모아 수련의 집중을 완성합니다.',
       // Essence
-      asana_name_kr: '바카사나',
+      asana_name_kr: '크라운차사나',
       essence_body1: '아쉬탕가 요가의 마이소르 수련은 단순한 유연함을 넘어선 정신적 단련입니다. 고도의 집중력이 요구되는 중급 이상의 아사나는 흔들리지 않는 내면의 힘을 증명합니다.',
       essence_body2: '우리 샬라는 전통의 전수 방식(Parampara)을 엄격히 따르며, 수련자 개개인의 속도에 맞춘 1:1 전수를 통해 당신의 잠재력을 깨웁니다.',
       pill_guide: '1:1 지도',
@@ -3763,7 +3748,7 @@
       pillar3_title: 'Drishti — Gazing Point',
       pillar3_desc: 'Each posture has a specific gaze point. By directing the eyes inward, scattered attention is collected and the depth of concentration is completed.',
       // Essence
-      asana_name_kr: 'Bakasana',
+      asana_name_kr: 'Krounchasana',
       essence_body1: 'The Mysore practice of Ashtanga yoga is a mental discipline that goes far beyond flexibility. The advanced asanas — demanding intense focus — are a testament to an unwavering inner strength.',
       essence_body2: 'Our shala strictly follows the traditional method of transmission (Parampara), awakening your potential through personalized 1:1 guidance tailored to each practitioner\'s own pace.',
       pill_guide: '1:1 Guidance',
