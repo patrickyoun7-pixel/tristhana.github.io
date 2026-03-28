@@ -12,8 +12,34 @@
 <link rel="manifest" href="site.webmanifest" />
 <meta name="theme-color" content="#37B294" />
 <style>
-@font-face { font-family:'Gilroy'; src:url('Gilroy-Light.otf') format('opentype'); font-weight:300 400; }
-@font-face { font-family:'Gilroy'; src:url('Gilroy-ExtraBold.otf') format('opentype'); font-weight:700 800; }
+@font-face {
+  font-family: 'Gilroy';
+  src: url('fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gilroy';
+  src: url('fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gilroy';
+  src: url('fonts/Gilroy-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gilroy';
+  src: url('fonts/Gilroy-ExtraBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --mint:#37B294;
@@ -25,7 +51,7 @@
   --text-2:rgba(232,226,217,0.75);
   --text-3:rgba(232,226,217,0.45);
 }
-html,body{background:var(--black);color:var(--text-1);font-family:'Gilroy','Helvetica Neue',Arial,sans-serif;font-weight:300;min-height:100%;line-height:1.7}
+html,body{background:var(--black);color:var(--text-1);font-family:'Gilroy',sans-serif;font-weight:300;min-height:100%;line-height:1.7}
 
 header{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 3rem;border-bottom:1px solid rgba(55,178,148,0.08);background:rgba(8,8,8,0.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
 .header-logo{font-family:'Gilroy',sans-serif;font-size:1.15rem;letter-spacing:0.18em;color:var(--mint);text-decoration:none;font-weight:700}

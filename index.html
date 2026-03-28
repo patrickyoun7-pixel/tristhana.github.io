@@ -266,12 +266,16 @@
     }
 
     .nav-logo {
-      font-family: 'Gilroy', sans-serif;
-      font-size: 1.15rem;
-      letter-spacing: 0.18em;
-      color: var(--mint);
+      display: flex;
+      align-items: center;
       text-decoration: none;
-      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .nav-logo-img {
+      height: 28px;
+      width: auto;
+      display: block;
     }
 
     .nav-links {
@@ -2276,6 +2280,163 @@
       font-size: 0.8rem;
     }
 
+    /* ── INSTRUCTOR — 원형 프로필 ── */
+    .iv2-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 2.5rem;
+    }
+
+    .iv2-card {
+      background: var(--surface);
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1.6rem;
+      padding: 2rem 1.8rem;
+      transition: background 0.3s;
+    }
+
+    .iv2-card:hover { background: var(--surface-2); }
+
+    /* 원장·부원장: 배경 차이만 아주 미세하게 */
+    .iv2-card.iv2-featured {
+      background: rgba(55,178,148,0.022);
+      border-left: 2px solid rgba(55,178,148,0.55);
+    }
+    .iv2-card.iv2-featured:hover { background: rgba(55,178,148,0.038); }
+
+    .iv2-card.iv2-sub {
+      background: rgba(55,178,148,0.013);
+      border-left: 2px solid rgba(55,178,148,0.3);
+    }
+    .iv2-card.iv2-sub:hover { background: rgba(55,178,148,0.026); }
+
+    /* Portrait ring */
+    .iv2-portrait-wrap {
+      flex-shrink: 0;
+      padding: 3px;
+      border-radius: 50%;
+      border: 1px solid rgba(55,178,148,0.18);
+    }
+
+    .iv2-portrait-mint {
+      border-color: rgba(55,178,148,0.6);
+      box-shadow: 0 0 12px rgba(55,178,148,0.08);
+    }
+
+    .iv2-portrait {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--surface-2);
+      flex-shrink: 0;
+    }
+
+    .iv2-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .iv2-initials-circle { display: grid; place-items: center; }
+
+    .iv2-initials-circle span {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--mint);
+      opacity: 0.28;
+    }
+
+    .iv2-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    .iv2-role {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--mint);
+      margin-bottom: 0.2rem;
+    }
+
+    .iv2-name {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .iv2-name-en {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.65rem;
+    }
+
+    .iv2-divider {
+      width: 24px; height: 1px;
+      background: var(--mint); opacity: 0.4;
+      margin-bottom: 0.65rem;
+    }
+
+    .iv2-bio {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 0.75rem;
+    }
+
+    .iv2-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0.85rem; }
+
+    .iv2-tags span {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      color: rgba(55,178,148,0.72);
+      border: 1px solid rgba(55,178,148,0.16);
+      padding: 0.18rem 0.55rem;
+      background: rgba(55,178,148,0.03);
+    }
+
+    /* 태블릿: 2열 */
+    @media (max-width: 1024px) {
+      .iv2-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* 모바일: 1열, 세로 레이아웃 전환 */
+    @media (max-width: 640px) {
+      .iv2-grid { grid-template-columns: 1fr; }
+      .iv2-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.8rem 1.4rem;
+        gap: 1rem;
+      }
+      .iv2-body { align-items: center; }
+      .iv2-divider { margin-left: auto; margin-right: auto; }
+      .iv2-tags { justify-content: center; }
+      .iv2-portrait { width: 96px; height: 96px; }
+    }
+
+    @media (max-width: 400px) {
+      .iv2-card { padding: 1.5rem 1rem; }
+      .iv2-name { font-size: 0.95rem; }
+      .iv2-bio { font-size: 0.72rem; }
+    }
+
     /* ── RESPONSIVE ── */
     /* hamburger — hidden on desktop */
     .hamburger { display: none; }
@@ -2447,7 +2608,7 @@
 
       /* Nav */
       nav { padding: 1rem 1.2rem; }
-      .nav-logo { font-size: 0.95rem; letter-spacing: 0.1em; }
+      .nav-logo-img { height: 22px; }
 
       /* YouTube — 1열 */
       .youtube-grid { grid-template-columns: 1fr; }
@@ -2542,7 +2703,9 @@
 
 <!-- NAV -->
 <nav aria-label="Main Navigation">
-  <a href="#" class="nav-logo">Tristhana Yoga</a>
+  <a href="#" class="nav-logo" aria-label="Tristhana Yoga">
+    <img src="images/logo-horizontal.svg" alt="Tristhana Yoga" class="nav-logo-img">
+  </a>
   <ul class="nav-links">
     <li><a href="#about" data-ko="아쉬탕가" data-en="Ashtanga">아쉬탕가</a></li>
     <li><a href="#shala" data-ko="샬라" data-en="Shala">샬라</a></li>
@@ -2669,15 +2832,15 @@
 <section class="essence-section">
   <div class="section-inner essence-inner">
 
-    <!-- LEFT: Asana SVG illustration -->
+    <!-- LEFT: Asana photo -->
     <div class="essence-asana">
       <div class="asana-frame">
         <div class="asana-photo">
-          <img src="images/essence-asana.jpg" alt="Ashtanga yoga Tittibhasana practice at Tristhana Yoga" style="width:100%;height:100%;object-fit:cover;object-position:center center;display:block;">
+          <img src="images/essense-asana.jpg" alt="Ashtanga yoga Bakasana practice at Tristhana Yoga" style="width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;">
         </div>
         <div class="asana-label">
-          <span class="asana-name-en">Tittibhasana</span>
-          <span class="asana-name-kr" data-i18n="asana_name_kr">티티바아사나</span>
+          <span class="asana-name-en">Bakasana</span>
+          <span class="asana-name-kr" data-i18n="asana_name_kr">바카사나</span>
         </div>
       </div>
     </div>
@@ -2792,135 +2955,87 @@
     <h2 class="section-title" data-i18n="instructor_title">강사 소개</h2>
     <p class="instructor-intro" data-i18n="instructor_intro">Tristhana Yoga의 강사진은 각자의 전문 수련 영역을 바탕으로 수련자 개개인에게 맞는 아쉬탕가 지도를 제공합니다.</p>
 
-    <!-- Row 1: 3 cards -->
-    <div class="instructor-card-grid top-row">
+    <div class="iv2-grid">
 
-      <div class="instructor-card featured">
-        <div class="ic-photo">
-          <img src="images/instructor-youngsoo.jpg" alt="하영수 — Tristhana Yoga 원장, Ashtanga Yoga Instructor" loading="lazy">
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-avatar" style="display:none;"></div>
-          <div class="ic-role">원장 · Director</div>
-          <h3 class="ic-name">하영수</h3>
-          <p class="ic-name-en">Youngsoo Ha</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_youngsoo">SYC Authorized Level II 자격 보유. Advanced 수련. 2012년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 원장으로 새벽 마이소르 클래스를 담당합니다.</p>
-          <div class="ic-tags">
-            <span>SYC Authorized L2</span>
-            <span>Advanced Series</span>
-            <span>새벽 마이소르</span>
-            <span>Lululemon Ambassador</span>
+      <div class="iv2-card iv2-featured">
+        <div class="iv2-portrait-wrap iv2-portrait-mint">
+          <div class="iv2-portrait">
+            <img src="images/instructor-youngsoo-portrait2.jpg" alt="하영수" loading="lazy" style="object-position:center 15%;">
           </div>
-          <a href="https://instagram.com/youngsoo.tristhana_yoga" target="_blank" class="ic-instagram" aria-label="하영수 Instagram">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig-g1" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig-g1)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-            @youngsoo.tristhana_yoga
-          </a>
+        </div>
+        <div class="iv2-body">
+          <div class="iv2-role">원장 · Director</div>
+          <h3 class="iv2-name">하영수</h3>
+          <p class="iv2-name-en">Youngsoo Ha</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_youngsoo">SYC Authorized Level II 자격 보유. Advanced Series 수련중. 2012년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 원장으로 새벽 마이소르 클래스를 담당합니다.</p>
+          <div class="iv2-tags">
+            <span>SYC Authorized L2</span><span>Advanced Series</span><span>새벽 마이소르</span><span>Lululemon Ambassador</span>
+          </div>
+          <a href="https://instagram.com/youngsoo.tristhana_yoga" target="_blank" class="ic-instagram" aria-label="하영수 Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="iv2-ig1" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#iv2-ig1)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>@youngsoo.tristhana_yoga</a>
         </div>
       </div>
 
-      <div class="instructor-card featured-sub">
-        <div class="ic-photo-placeholder">
-          <span class="ic-initials-lg">JK</span>
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-role">부원장 · Co-Director</div>
-          <h3 class="ic-name">김지원</h3>
-          <p class="ic-name-en">Jiwon Kim</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_jiwon">SYC Authorized Level II 자격 보유. Advanced 수련. 2019년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 부원장으로 오전 마이소르 및 저녁 마이소르 클래스를 담당합니다.</p>
-          <div class="ic-tags">
-            <span>SYC Authorized L2</span>
-            <span>Advanced Series</span>
-            <span>오전·저녁 마이소르</span>
-          </div>
-          <a href="https://instagram.com/piaf0777" target="_blank" class="ic-instagram" aria-label="김지원 Instagram">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig-g2" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig-g2)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-            @piaf0777
-          </a>
+      <div class="iv2-card iv2-sub">
+        <div class="iv2-portrait-wrap"><div class="iv2-portrait iv2-initials-circle"><span>JK</span></div></div>
+        <div class="iv2-body">
+          <div class="iv2-role">부원장 · Co-Director</div>
+          <h3 class="iv2-name">김지원</h3>
+          <p class="iv2-name-en">Jiwon Kim</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_jiwon">SYC Authorized Level II 자격 보유. Advanced Series 수련중. 2019년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 부원장으로 오전 마이소르 및 저녁 마이소르 클래스를 담당합니다.</p>
+          <div class="iv2-tags"><span>SYC Authorized L2</span><span>Advanced Series</span><span>오전·저녁 마이소르</span></div>
+          <a href="https://instagram.com/piaf0777" target="_blank" class="ic-instagram" aria-label="김지원 Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="iv2-ig2" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#iv2-ig2)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>@piaf0777</a>
         </div>
       </div>
 
-      <div class="instructor-card">
-        <div class="ic-photo-placeholder">
-          <span class="ic-initials-lg">DJ</span>
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-role">강사 · Instructor</div>
-          <h3 class="ic-name">정다감</h3>
-          <p class="ic-name-en">Dagam Jung</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_dagam">2021년부터 마이소르 수련 중. Intermediate Series 수련. 주말 수업 및 명상 수업을 담당합니다.</p>
-          <div class="ic-tags">
-            <span>Intermediate Series</span>
-            <span>주말 수업</span>
-            <span>명상 수업</span>
-          </div>
-          <a href="https://instagram.com/dg.j_" target="_blank" class="ic-instagram" aria-label="정다감 Instagram">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig-g3" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig-g3)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-            @dg.j_
-          </a>
+      <div class="iv2-card">
+        <div class="iv2-portrait-wrap"><div class="iv2-portrait iv2-initials-circle"><span>DJ</span></div></div>
+        <div class="iv2-body">
+          <div class="iv2-role">강사 · Instructor</div>
+          <h3 class="iv2-name">정다감</h3>
+          <p class="iv2-name-en">Dagam Jung</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_dagam">2021년부터 마이소르 수련 중. Intermediate Series 수련중. Ashtanga Yoga Primary Series Workshop 수료, 근근막 통증 증후군 Workshop 수료, Ball Therapy &amp; 근막경선 Workshop 수료, One World (현)O&amp;O Academy in India TND(The New Destiny) Spiritual Intensive Course 수료, MIT(Meditation Instructors' Training) 수료, SoulSync Meditation Training Workshop 수료. 주말 수업 및 명상 수업을 담당합니다.</p>
+          <div class="iv2-tags"><span>Intermediate Series</span><span>주말 수업</span><span>명상 수업</span></div>
+          <a href="https://instagram.com/dg.j_" target="_blank" class="ic-instagram" aria-label="정다감 Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="iv2-ig3" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#iv2-ig3)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>@dg.j_</a>
         </div>
       </div>
 
-    </div>
-
-    <!-- Row 2: 3 cards -->
-    <div class="instructor-card-grid bottom-row" style="width:100%;">
-
-      <div class="instructor-card">
-        <div class="ic-photo-placeholder">
-          <span class="ic-initials-lg">SN</span>
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-role">강사 · Instructor</div>
-          <h3 class="ic-name">나순화</h3>
-          <p class="ic-name-en">Sunwha Na</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_sunwha">2021년부터 마이소르 수련 중. Intermediate Series 수련. 김동진 아쉬탕가 프라이머리 워크샵 및 트리스타나요가 기능 해부학 워크샵 참가. 점심 수업을 담당합니다.</p>
-          <div class="ic-tags">
-            <span>Intermediate Series</span>
-            <span>점심 수업</span>
-          </div>
+      <div class="iv2-card">
+        <div class="iv2-portrait-wrap"><div class="iv2-portrait iv2-initials-circle"><span>SN</span></div></div>
+        <div class="iv2-body">
+          <div class="iv2-role">강사 · Instructor</div>
+          <h3 class="iv2-name">나순화</h3>
+          <p class="iv2-name-en">Sunwha Na</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_sunwha">2021년부터 마이소르 수련 중. Intermediate Series 수련중. Ashtanga Yoga Primary Series Workshop 수료, 아쉬탕가 요가 Intermediate Workshop 수료, 기능해부학 워크샵 수료, Cyoga Intensive Training Workshop 수료, 임산부 요가 TTC 수료. 점심 수업을 담당합니다.</p>
+          <div class="iv2-tags"><span>Intermediate Series</span><span>점심 수업</span></div>
         </div>
       </div>
 
-      <div class="instructor-card">
-        <div class="ic-photo-placeholder">
-          <span class="ic-initials-lg">SK</span>
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-role">강사 · Instructor</div>
-          <h3 class="ic-name">강수민</h3>
-          <p class="ic-name-en">Sumin Kang</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_sumin">2023년 마이소르 수련중. Intermediate Series 수련. 24년 Sarath Jois New York Workshop 및 25년 Ashtanga Yoga Bali Research Center에서 Ashtanga Yoga Teacher and Lifestyle Workshop 참가. 점심 수업 및 주말 수업을 담당합니다.</p>
-          <div class="ic-tags">
-            <span>Intermediate Series</span>
-            <span>점심 수업</span>
-            <span>주말 수업</span>
-          </div>
-          <a href="https://instagram.com/purewatersumin" target="_blank" class="ic-instagram" aria-label="강수민 Instagram">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig-g4" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig-g4)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-            @purewatersumin
-          </a>
+      <div class="iv2-card">
+        <div class="iv2-portrait-wrap"><div class="iv2-portrait iv2-initials-circle"><span>SK</span></div></div>
+        <div class="iv2-body">
+          <div class="iv2-role">강사 · Instructor</div>
+          <h3 class="iv2-name">강수민</h3>
+          <p class="iv2-name-en">Sumin Kang</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_sumin">2023년부터 마이소르 수련 중. Intermediate Series 수련중. Sarath Jois New York Workshop 및 Ashtanga Yoga Bali Research Center에서 Ashtanga Yoga Teacher and Lifestyle Workshop 참가. 점심 수업 및 주말 수업을 담당합니다.</p>
+          <div class="iv2-tags"><span>Intermediate Series</span><span>점심 수업</span><span>주말 수업</span></div>
+          <a href="https://instagram.com/purewatersumin" target="_blank" class="ic-instagram" aria-label="강수민 Instagram"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="iv2-ig4" cx="30%" cy="107%" r="120%"><stop offset="0%" stop-color="#fdf497"/><stop offset="5%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#iv2-ig4)"/><circle cx="12" cy="12" r="5" fill="none" stroke="white" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>@purewatersumin</a>
         </div>
       </div>
 
-      <div class="instructor-card">
-        <div class="ic-photo-placeholder">
-          <span class="ic-initials-lg">YK</span>
-        </div>
-        <div class="ic-body ic-body-inner">
-          <div class="ic-role">실장 · Studio Manager</div>
-          <h3 class="ic-name">김예성</h3>
-          <p class="ic-name-en">Yesung Kim</p>
-          <div class="ic-divider"></div>
-          <p class="ic-bio" data-i18n="bio_yesung">2018년부터 마이소르 수련 중. Intermediate Series 수련. 요가원의 실장으로 요가원 운영 전반을 관리합니다.</p>
-          <div class="ic-tags">
-            <span>Intermediate Series</span>
-            <span>Studio Management</span>
-          </div>
+      <div class="iv2-card">
+        <div class="iv2-portrait-wrap"><div class="iv2-portrait iv2-initials-circle"><span>YK</span></div></div>
+        <div class="iv2-body">
+          <div class="iv2-role">실장 · Studio Manager</div>
+          <h3 class="iv2-name">김예성</h3>
+          <p class="iv2-name-en">Yesung Kim</p>
+          <div class="iv2-divider"></div>
+          <p class="iv2-bio" data-i18n="bio_yesung">2018년부터 마이소르 수련 중. Intermediate Series 수련중. 요가원의 실장으로 요가원 운영 전반을 관리합니다.</p>
+          <div class="iv2-tags"><span>Intermediate Series</span><span>Studio Management</span></div>
         </div>
       </div>
 
@@ -2928,6 +3043,8 @@
   </div>
 </section>
 </article>
+
+
 
 
 <!-- PARAMPARA / LINEAGE -->
@@ -3509,7 +3626,7 @@
       pillar3_title: 'Drishti — 응시점',
       pillar3_desc: '각 자세마다 정해진 시선의 방향. 외부로 흩어지는 주의를 내면으로 모아 수련의 집중을 완성합니다.',
       // Essence
-      asana_name_kr: '티티바아사나',
+      asana_name_kr: '바카사나',
       essence_body1: '아쉬탕가 요가의 마이소르 수련은 단순한 유연함을 넘어선 정신적 단련입니다. 고도의 집중력이 요구되는 중급 이상의 아사나는 흔들리지 않는 내면의 힘을 증명합니다.',
       essence_body2: '우리 샬라는 전통의 전수 방식(Parampara)을 엄격히 따르며, 수련자 개개인의 속도에 맞춘 1:1 전수를 통해 당신의 잠재력을 깨웁니다.',
       pill_guide: '1:1 지도',
@@ -3531,12 +3648,12 @@
       // Instructor
       instructor_title: '강사 소개',
       instructor_intro: 'Tristhana Yoga의 강사진은 각자의 전문 수련 영역을 바탕으로 수련자 개개인에게 맞는 아쉬탕가 지도를 제공합니다.',
-      bio_youngsoo: 'SYC Authorized Level II 자격 보유. Advanced 수련. 2012년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 원장으로 새벽 마이소르 클래스를 담당합니다.',
-      bio_jiwon: 'SYC Authorized Level II 자격 보유. Advanced 수련. 2019년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 부원장으로 오전 마이소르 및 저녁 마이소르 클래스를 담당합니다.',
-      bio_dagam: '2021년부터 마이소르 수련 중. Intermediate Series 수련. 주말 수업 및 명상 수업을 담당합니다.',
-      bio_sunwha: '2021년부터 마이소르 수련 중. Intermediate Series 수련. 김동진 아쉬탕가 프라이머리 워크샵 및 트리스타나요가 기능 해부학 워크샵 참가. 점심 수업을 담당합니다.',
-      bio_sumin: '2023년 마이소르 수련중. Intermediate Series 수련. 24년 Sarath Jois New York Workshop 및 25년 Ashtanga Yoga Bali Research Center에서 Ashtanga Yoga Teacher and Lifestyle Workshop 참가. 점심 수업 및 주말 수업을 담당합니다.',
-      bio_yesung: '2018년부터 마이소르 수련 중. Intermediate Series 수련. 요가원의 실장으로 요가원 운영 전반을 관리합니다.',
+      bio_youngsoo: 'SYC Authorized Level II 자격 보유. Advanced Series 수련중. 2012년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 원장으로 새벽 마이소르 클래스를 담당합니다.',
+      bio_jiwon: 'SYC Authorized Level II 자격 보유. Advanced Series 수련중. 2019년부터 인도 마이소르에서 수련을 이어오고 있으며, Tristhana Yoga 부원장으로 오전 마이소르 및 저녁 마이소르 클래스를 담당합니다.',
+      bio_dagam: '2021년부터 마이소르 수련 중. Intermediate Series 수련중. Ashtanga Yoga Primary Series Workshop 수료, 근근막 통증 증후군 Workshop 수료, Ball Therapy & 근막경선 Workshop 수료, One World (현)O&O Academy in India TND(The New Destiny) Spiritual Intensive Course 수료, MIT(Meditation Instructors\' Training) 수료, SoulSync Meditation Training Workshop 수료. 주말 수업 및 명상 수업을 담당합니다.',
+      bio_sunwha: '2021년부터 마이소르 수련 중. Intermediate Series 수련중. Ashtanga Yoga Primary Series Workshop 수료, 아쉬탕가 요가 Intermediate Workshop 수료, 기능해부학 워크샵 수료, Cyoga Intensive Training Workshop 수료, 임산부 요가 TTC 수료. 점심 수업을 담당합니다.',
+      bio_sumin: '2023년부터 마이소르 수련 중. Intermediate Series 수련중. Sarath Jois New York Workshop 및 Ashtanga Yoga Bali Research Center에서 Ashtanga Yoga Teacher and Lifestyle Workshop 참가. 점심 수업 및 주말 수업을 담당합니다.',
+      bio_yesung: '2018년부터 마이소르 수련 중. Intermediate Series 수련중. 요가원의 실장으로 요가원 운영 전반을 관리합니다.',
       // Lineage
       lineage_title: '스승의 계보',
       lineage_intro: '아쉬탕가 요가에서 <em>Parampara(파람파라)</em>는 스승에서 제자로 직접 전수되는 구전 전통을 의미합니다. 이 계보는 단순한 기술의 전달이 아닌, 수련의 정신과 철학이 살아있는 연결고리입니다. Tristhana Yoga는 그 정통 계보 안에서 수업을 제공합니다.',
@@ -3660,7 +3777,7 @@
       pillar3_title: 'Drishti — Gazing Point',
       pillar3_desc: 'Each posture has a specific gaze point. By directing the eyes inward, scattered attention is collected and the depth of concentration is completed.',
       // Essence
-      asana_name_kr: 'Tittibhasana',
+      asana_name_kr: 'Bakasana',
       essence_body1: 'The Mysore practice of Ashtanga yoga is a mental discipline that goes far beyond flexibility. The advanced asanas — demanding intense focus — are a testament to an unwavering inner strength.',
       essence_body2: 'Our shala strictly follows the traditional method of transmission (Parampara), awakening your potential through personalized 1:1 guidance tailored to each practitioner\'s own pace.',
       pill_guide: '1:1 Guidance',
@@ -3682,12 +3799,12 @@
       // Instructor
       instructor_title: 'Our Teachers',
       instructor_intro: 'Tristhana Yoga\'s instructors provide personalized Ashtanga guidance based on each practitioner\'s individual needs and level of practice.',
-      bio_youngsoo: 'SYC Authorized Level II. Advanced Series practitioner. Practicing in Mysore, India since 2012. Leads the early morning Mysore class as Director of Tristhana Yoga.',
-      bio_jiwon: 'SYC Authorized Level II. Advanced Series practitioner. Practicing in Mysore, India since 2019. Leads the morning and evening Mysore classes as Co-Director of Tristhana Yoga.',
-      bio_dagam: 'Practicing Mysore since 2021. Intermediate Series practitioner. Teaches weekend and meditation classes.',
-      bio_sunwha: 'Practicing Mysore since 2021. Intermediate Series practitioner. Attended Kim Dongjin Ashtanga Primary Workshop and Tristhana Yoga Functional Anatomy Workshop. Teaches the lunch class.',
-      bio_sumin: 'Practicing Mysore since 2023. Intermediate Series practitioner. Attended Sarath Jois New York Workshop in 2024 and Ashtanga Yoga Teacher and Lifestyle Workshop at Ashtanga Yoga Bali Research Center in 2025. Teaches lunch and weekend classes.',
-      bio_yesung: 'Practicing Mysore since 2018. Intermediate Series practitioner. Manages overall studio operations as Studio Manager.',
+      bio_youngsoo: 'SYC Authorized Level II. Currently training Advanced Series. Practicing in Mysore, India since 2012. Leads the early morning Mysore class as Director of Tristhana Yoga.',
+      bio_jiwon: 'SYC Authorized Level II. Currently training Advanced Series. Practicing in Mysore, India since 2019. Leads the morning and evening Mysore classes as Co-Director of Tristhana Yoga.',
+      bio_dagam: 'Practicing Mysore since 2021. Currently training Intermediate Series. Completed: Ashtanga Yoga Primary Series Workshop, Myofascial Pain Syndrome Workshop, Ball Therapy & Fascial Lines Workshop, One World (now O&O Academy in India) TND Spiritual Intensive Course, MIT (Meditation Instructors\' Training), SoulSync Meditation Training Workshop. Teaches weekend and meditation classes.',
+      bio_sunwha: 'Practicing Mysore since 2021. Currently training Intermediate Series. Completed: Ashtanga Yoga Primary Series Workshop, Ashtanga Yoga Intermediate Workshop, Functional Anatomy Workshop, Cyoga Intensive Training Workshop, Prenatal Yoga TTC. Teaches the lunch class.',
+      bio_sumin: 'Practicing Mysore since 2023. Currently training Intermediate Series. Attended Sarath Jois New York Workshop and Ashtanga Yoga Teacher and Lifestyle Workshop at Ashtanga Yoga Bali Research Center. Teaches lunch and weekend classes.',
+      bio_yesung: 'Intermediate Series practitioner. Manages overall studio operations as Studio Manager.',
       // Lineage
       lineage_title: 'Parampara — Lineage',
       lineage_intro: 'In Ashtanga yoga, <em>Parampara</em> refers to the oral tradition of direct transmission from teacher to student. This lineage is not merely a transfer of technique, but a living thread of the spirit and philosophy of practice. Tristhana Yoga teaches within this authentic lineage.',
