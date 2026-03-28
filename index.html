@@ -2762,7 +2762,7 @@
       <div class="about-text">
         <p class="section-label">Ashtanga Vinyasa Yoga</p>
         <h2 class="section-title-kr" data-i18n="about_title">아쉬탕가 빈야사 요가란</h2>
-        <p data-i18n="about_body1">아쉬탕가 빈야사 요가는 인도 마이소르의 Sri K. Pattabhi Jois가 체계화한 전통 요가 수련법입니다. 고정된 아사나 시퀀스, 빈야사(연결 동작), 우자이 호흡, 드리쉬티(응시점)를 통해 내면의 열기와 집중을 만들어냅니다.</p>
+        <p data-i18n="about_body1">아쉬탕가 빈야사 요가는 인도 마이소르의 Sri K. Pattabhi Jois가 체계화한 전통 요가 수련법입니다. 고정된 아사나 시퀀스, 빈야사(연결 동작), 우자이 호흡, 드리쉬티(응시점)를 통해 집중을 만들고, 그 집중이 연속적으로 연결되어 명상의 에너지를 만들어 냅니다.</p>
         <p data-i18n="about_body2">빠르게 변화하는 판교의 일상 속에서, 아쉬탕가 수련은 단순한 운동을 넘어 마음의 중심을 찾는 깊은 수련이 됩니다. 꾸준한 수련을 통해 신체적 강인함과 정신적 명료함을 함께 얻을 수 있습니다.</p>
       </div>
 
@@ -2779,7 +2779,7 @@
           <span class="pillar-num">◆</span>
           <div class="pillar-content">
             <h4 data-i18n="pillar2_title">Asana — 아사나</h4>
-            <p data-i18n="pillar2_desc">정해진 시퀀스에 따라 수련합니다. 각 자세는 이전 자세를 위한 준비이며, 점진적으로 몸의 힘과 유연성을 계발합니다.</p>
+            <p data-i18n="pillar2_desc">정해진 시퀀스에 따라 수련합니다. 각 자세는 이전 자세를 위한 준비이며, 힘과 유연성의 균형을 찾아 조화롭게 발달시킵니다.</p>
           </div>
         </div>
         <div class="pillar">
@@ -3442,14 +3442,21 @@
       <div class="location-card" id="contact">
         <div class="location-map-embed">
           <div id="daumRoughmapContainer1774704241260" class="root_daum_roughmap root_daum_roughmap_landing"></div>
-          <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"></script>
           <script charset="UTF-8">
-            new daum.roughmap.Lander({
-              "timestamp": "1774704241260",
-              "key": "k598xryqq68",
-              "mapWidth": "640",
-              "mapHeight": "360"
-            }).render();
+            (function() {
+              var script = document.createElement('script');
+              script.charset = 'UTF-8';
+              script.src = 'https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js';
+              script.onload = function() {
+                new daum.roughmap.Lander({
+                  "timestamp": "1774704241260",
+                  "key": "k598xryqq68",
+                  "mapWidth": "640",
+                  "mapHeight": "360"
+                }).render();
+              };
+              document.head.appendChild(script);
+            })();
           </script>
         </div>
         <div class="location-info">
@@ -3586,13 +3593,13 @@
       hero_tagline: '아쉬탕가 요가 공인 티쳐가 운영하는<br>아쉬탕가 전문 요가 스튜디오입니다.',
       // About
       about_title: '아쉬탕가 빈야사 요가란',
-      about_body1: '아쉬탕가 빈야사 요가는 인도 마이소르의 Sri K. Pattabhi Jois가 체계화한 전통 요가 수련법입니다. 고정된 아사나 시퀀스, 빈야사(연결 동작), 우자이 호흡, 드리쉬티(응시점)를 통해 내면의 열기와 집중을 만들어냅니다.',
+      about_body1: '아쉬탕가 빈야사 요가는 인도 마이소르의 Sri K. Pattabhi Jois가 체계화한 전통 요가 수련법입니다. 고정된 아사나 시퀀스, 빈야사(연결 동작), 우자이 호흡, 드리쉬티(응시점)를 통해 집중을 만들고, 그 집중이 연속적으로 연결되어 명상의 에너지를 만들어 냅니다.',
       about_body2: '빠르게 변화하는 판교의 일상 속에서, 아쉬탕가 수련은 단순한 운동을 넘어 마음의 중심을 찾는 깊은 수련이 됩니다. 꾸준한 수련을 통해 신체적 강인함과 정신적 명료함을 함께 얻을 수 있습니다.',
       pillars_label: 'Tristhana — 세 가지 중점사항',
       pillar1_title: 'Ujjayi Pranayama — 우자이 호흡',
       pillar1_desc: '목구멍을 살짝 조여 만드는 빅토리 호흡. 내부의 열(tapas)을 생성하고 수련 전반을 안정적으로 이끕니다.',
       pillar2_title: 'Asana — 아사나',
-      pillar2_desc: '정해진 시퀀스에 따라 수련합니다. 각 자세는 이전 자세를 위한 준비이며, 점진적으로 몸의 힘과 유연성을 계발합니다.',
+      pillar2_desc: '정해진 시퀀스에 따라 수련합니다. 각 자세는 이전 자세를 위한 준비이며, 힘과 유연성의 균형을 찾아 조화롭게 발달시킵니다.',
       pillar3_title: 'Drishti — 응시점',
       pillar3_desc: '각 자세마다 정해진 시선의 방향. 외부로 흩어지는 주의를 내면으로 모아 수련의 집중을 완성합니다.',
       // Essence
@@ -3738,13 +3745,13 @@
       hero_tagline: 'A studio led by SYC Authorized teachers,<br>dedicated to the traditional Ashtanga practice.',
       // About
       about_title: 'What is Ashtanga Vinyasa Yoga?',
-      about_body1: 'Ashtanga Vinyasa Yoga is a traditional system of yoga codified by Sri K. Pattabhi Jois of Mysore, India. Through a fixed sequence of asanas, vinyasa (linking movements), Ujjayi breath, and Drishti (gaze points), practitioners cultivate inner heat and deep concentration.',
+      about_body1: 'Ashtanga Vinyasa Yoga is a traditional system of yoga codified by Sri K. Pattabhi Jois of Mysore, India. Through a fixed sequence of asanas, vinyasa (linking movements), Ujjayi breath, and Drishti (gaze points), practitioners cultivate concentration — and that sustained concentration flows continuously, generating the energy of meditation.',
       about_body2: 'In the busy rhythms of Pangyo\'s urban life, Ashtanga practice becomes more than exercise — it is a deep discipline for finding your center. Through consistent daily practice, you develop both physical strength and mental clarity.',
       pillars_label: 'Tristhana — Three Points of Focus',
       pillar1_title: 'Ujjayi Pranayama — Victory Breath',
       pillar1_desc: 'A victorious breath created by gently constricting the throat. It generates internal heat (tapas) and provides a steady anchor throughout the practice.',
       pillar2_title: 'Asana — Posture',
-      pillar2_desc: 'Practice follows a fixed sequence. Each posture prepares the body for the next, progressively developing strength and flexibility over time.',
+      pillar2_desc: 'Practice follows a fixed sequence. Each posture prepares the body for the next, harmoniously developing the balance of strength and flexibility.',
       pillar3_title: 'Drishti — Gazing Point',
       pillar3_desc: 'Each posture has a specific gaze point. By directing the eyes inward, scattered attention is collected and the depth of concentration is completed.',
       // Essence
