@@ -1079,53 +1079,31 @@
       padding: 2.5rem;
     }
 
-    .location-map-placeholder {
-      background: #111;
-      border: 1px solid rgba(55,178,148,0.1);
-      height: 180px;
-      display: grid;
-      place-items: center;
-      margin-bottom: 1.8rem;
+    .location-map-embed {
       position: relative;
+      height: 240px;
+      margin-bottom: 1.8rem;
+      border: 1px solid rgba(55,178,148,0.15);
       overflow: hidden;
     }
 
-    /* Simple SVG map stand-in */
-    .map-dot {
-      width: 12px; height: 12px;
-      background: var(--mint);
-      border-radius: 50%;
-      box-shadow: 0 0 20px var(--mint);
-      animation: map-pulse 2s ease-in-out infinite;
-    }
-
-    .map-rings {
+    .map-open-link {
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
+      bottom: 0.7rem;
+      right: 0.8rem;
+      background: rgba(8,8,8,0.82);
+      border: 1px solid rgba(55,178,148,0.35);
+      color: var(--mint);
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.7rem;
+      text-decoration: none;
+      transition: background 0.2s;
+      backdrop-filter: blur(4px);
     }
 
-    .map-ring {
-      position: absolute;
-      border: 1px solid var(--mint);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      animation: ring-expand 2.5s ease-out infinite;
-      top: 0; left: 0;
-    }
-
-    .map-ring:nth-child(2) { animation-delay: 0.8s; }
-    .map-ring:nth-child(3) { animation-delay: 1.6s; }
-
-    @keyframes map-pulse {
-      0%, 100% { box-shadow: 0 0 10px var(--mint); }
-      50% { box-shadow: 0 0 25px var(--mint); }
-    }
-
-    @keyframes ring-expand {
-      0% { width: 16px; height: 16px; opacity: 0.8; }
-      100% { width: 80px; height: 80px; opacity: 0; }
-    }
+    .map-open-link:hover { background: rgba(55,178,148,0.12); }
 
     .location-info { display: flex; flex-direction: column; gap: 0.8rem; }
 
@@ -3473,15 +3451,22 @@
       </div>
 
       <div class="location-card" id="contact">
-        <a href="https://naver.me/5HyDZEIu" target="_blank" class="location-map-placeholder" style="text-decoration:none;display:block;cursor:pointer;">
-          <div class="map-rings">
-            <div class="map-ring"></div>
-            <div class="map-ring"></div>
-            <div class="map-ring"></div>
-          </div>
-          <div class="map-dot"></div>
-          <span style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-family:'Gilroy',sans-serif;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--mint);opacity:0.7;white-space:nowrap;">네이버 지도에서 보기 →</span>
-        </a>
+        <div class="location-map-embed">
+          <iframe
+            src="https://map.kakao.com/link/map/에이치스퀘어S동,37.394763,127.111058/1"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allowfullscreen
+            loading="lazy"
+            title="Tristhana Yoga 위치"
+            style="border:0;display:block;">
+          </iframe>
+          <a href="https://map.kakao.com/link/to/트리스타나요가,37.394763,127.111058"
+             target="_blank"
+             class="map-open-link"
+             data-i18n="map_open">카카오맵에서 열기 →</a>
+        </div>
         <div class="location-info">
           <div class="loc-row">
             <span class="loc-label" data-i18n="loc_main">본원</span>
@@ -3744,6 +3729,7 @@
       loc_facility_val: '남녀 샤워장 · 파우더룸 제공',
       loc_phone: '전화',
       loc_blog: '블로그',
+      map_open: '카카오맵에서 열기 →',
       // Footer
       footer_classes: '수업',
       footer_info: '정보',
@@ -3895,6 +3881,7 @@
       loc_facility_val: 'Separate shower rooms & powder rooms for men & women',
       loc_phone: 'Phone',
       loc_blog: 'Blog',
+      map_open: 'Open in Kakao Maps →',
       // Footer
       footer_classes: 'Classes',
       footer_info: 'Info',
