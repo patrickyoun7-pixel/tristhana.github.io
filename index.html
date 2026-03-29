@@ -1079,20 +1079,74 @@
       padding: 2.5rem;
     }
 
-    .location-map-embed {
+    .map-app-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5px;
       margin-bottom: 1.8rem;
-      border: 1px solid rgba(55,178,148,0.15);
-      overflow: hidden;
-      line-height: 0;
-      height: 360px;
+      border: 1px solid var(--border);
     }
 
-    .location-map-embed .root_daum_roughmap {
-      width: 100% !important;
+    .map-app-btn {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 1rem 1.2rem;
+      background: var(--surface-2);
+      text-decoration: none;
+      transition: background 0.2s;
     }
 
-    .location-map-embed img {
-      max-width: 100%;
+    .map-app-btn:hover { background: rgba(55,178,148,0.06); }
+
+    .map-app-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-app-icon svg {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    .map-app-label {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .map-app-name {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.03em;
+    }
+
+    .map-app-sub {
+      font-family: 'Gilroy', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .map-app-arrow {
+      font-size: 0.75rem;
+      color: var(--mint);
+      opacity: 0.6;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .map-app-btn:hover .map-app-arrow {
+      opacity: 1;
+      transform: translateX(3px);
     }
 
     .location-info { display: flex; flex-direction: column; gap: 0.8rem; }
@@ -3441,24 +3495,51 @@
       </div>
 
       <div class="location-card" id="contact">
-        <div class="location-map-embed">
-          <div id="daumRoughmapContainer1774704241260" class="root_daum_roughmap root_daum_roughmap_landing"></div>
-          <script charset="UTF-8">
-            (function() {
-              var script = document.createElement('script');
-              script.charset = 'UTF-8';
-              script.src = 'https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js';
-              script.onload = function() {
-                new daum.roughmap.Lander({
-                  "timestamp": "1774704241260",
-                  "key": "k598xryqq68",
-                  "mapWidth": "640",
-                  "mapHeight": "360"
-                }).render();
-              };
-              document.head.appendChild(script);
-            })();
-          </script>
+        <div class="map-app-links">
+          <!-- 네이버 지도 -->
+          <a href="https://naver.me/5HyDZEIu" target="_blank" class="map-app-btn map-app-naver" aria-label="네이버 지도에서 보기">
+            <span class="map-app-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <rect width="24" height="24" rx="4" fill="#03C75A"/>
+                <path d="M13.18 12.18L10.64 8H8v8h2.82v-4.18L13.36 16H16V8h-2.82v4.18z" fill="#ffffff"/>
+              </svg>
+            </span>
+            <span class="map-app-label">
+              <span class="map-app-name">네이버 지도</span>
+              <span class="map-app-sub">Naver Maps</span>
+            </span>
+            <span class="map-app-arrow">→</span>
+          </a>
+
+          <!-- 카카오맵 -->
+          <a href="https://place.map.kakao.com/1396777214" target="_blank" class="map-app-btn map-app-kakao" aria-label="카카오맵에서 보기">
+            <span class="map-app-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <rect width="24" height="24" rx="4" fill="#FEE500"/>
+                <path d="M12 5C8.134 5 5 7.462 5 10.5c0 1.928 1.14 3.628 2.875 4.662l-.737 2.715a.25.25 0 0 0 .376.277L10.74 16.3A8.2 8.2 0 0 0 12 16c3.866 0 7-2.462 7-5.5S15.866 5 12 5z" fill="#3C1E1E"/>
+              </svg>
+            </span>
+            <span class="map-app-label">
+              <span class="map-app-name">카카오맵</span>
+              <span class="map-app-sub">Kakao Maps</span>
+            </span>
+            <span class="map-app-arrow">→</span>
+          </a>
+
+          <!-- 티맵 -->
+          <a href="tmap://search?name=트리스타나요가&lon=127.111058&lat=37.394763" target="_blank" class="map-app-btn map-app-tmap" aria-label="티맵에서 길찾기">
+            <span class="map-app-icon">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <rect width="24" height="24" rx="4" fill="#E8232A"/>
+                <path d="M12 4a6 6 0 0 0-6 6c0 4 6 10 6 10s6-6 6-10a6 6 0 0 0-6-6zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" fill="#ffffff"/>
+              </svg>
+            </span>
+            <span class="map-app-label">
+              <span class="map-app-name">티맵</span>
+              <span class="map-app-sub">T Map 길찾기</span>
+            </span>
+            <span class="map-app-arrow">→</span>
+          </a>
         </div>
         <div class="location-info">
           <div class="loc-row">
