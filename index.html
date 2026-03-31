@@ -2324,19 +2324,6 @@
 
     .iv2-card:hover { background: var(--surface-2); }
 
-    /* 원장·부원장: 배경 차이만 아주 미세하게 */
-    .iv2-card.iv2-featured {
-      background: rgba(55,178,148,0.022);
-      border-left: 2px solid rgba(55,178,148,0.55);
-    }
-    .iv2-card.iv2-featured:hover { background: rgba(55,178,148,0.038); }
-
-    .iv2-card.iv2-sub {
-      background: rgba(55,178,148,0.013);
-      border-left: 2px solid rgba(55,178,148,0.3);
-    }
-    .iv2-card.iv2-sub:hover { background: rgba(55,178,148,0.026); }
-
     /* Portrait ring */
     .iv2-portrait-wrap {
       flex-shrink: 0;
@@ -2345,10 +2332,6 @@
       border: 1px solid rgba(55,178,148,0.18);
     }
 
-    .iv2-portrait-mint {
-      border-color: rgba(55,178,148,0.6);
-      box-shadow: 0 0 12px rgba(55,178,148,0.08);
-    }
 
     .iv2-portrait {
       width: 88px;
@@ -2979,8 +2962,8 @@
 
     <div class="iv2-grid">
 
-      <div class="iv2-card iv2-featured">
-        <div class="iv2-portrait-wrap iv2-portrait-mint">
+      <div class="iv2-card">
+        <div class="iv2-portrait-wrap">
           <div class="iv2-portrait">
             <img src="images/instructor-youngsoo-portrait2.jpg" alt="하영수" loading="lazy" style="object-position:center 15%;">
           </div>
@@ -2998,7 +2981,7 @@
         </div>
       </div>
 
-      <div class="iv2-card iv2-sub">
+      <div class="iv2-card">
         <div class="iv2-portrait-wrap"><div class="iv2-portrait"><img src="images/instructor-jiwon-portrait.jpg" alt="김지원" loading="lazy" style="object-position:center 12%;"></div></div>
         <div class="iv2-body">
           <div class="iv2-role">부원장 · Co-Director</div>
